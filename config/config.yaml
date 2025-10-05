@@ -1,0 +1,52 @@
+# Shopify RAG Configuration
+
+# Embedding provider: "openai" or "local"
+embedding:
+  provider: "local"  # Options: "openai", "local"
+
+  # OpenAI settings
+  openai:
+    model: "text-embedding-3-large"  # text-embedding-3-large or text-embedding-3-small
+    batch_size: 100
+
+  # Local model settings (sentence-transformers)
+  local:
+    model: "intfloat/multilingual-e5-large"  # or paraphrase-multilingual-mpnet-base-v2
+    batch_size: 32
+    device: "cpu"  # cpu or cuda
+
+# LLM settings
+llm:
+  provider: "openai"
+  model: "gpt-4o-mini"  # gpt-4o-mini or gpt-4o
+  temperature: 0.7
+  max_tokens: 500
+
+# API settings
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  workers: 1
+
+  # CORS settings
+  cors:
+    enabled: true
+    origins: ["*"]  # In production, specify your domains
+
+# Data paths
+data:
+  products_rag: "./out/products_rag.jsonl"
+  products_sot: "./out/products_sot.jsonl"
+
+# Search settings
+search:
+  default_top_k: 3
+  deduplicate: true
+
+# Widget settings
+widget:
+  title: "Ürün Danışmanı"
+  button_text: "💬"
+  primary_color: "#000000"
+  position: "bottom-right"  # bottom-right or bottom-left

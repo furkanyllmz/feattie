@@ -1,6 +1,0 @@
-.venv/
-out/
-__pycache__/
-*.pyc
-products_rag.jsonl
-products_sot.jsonl

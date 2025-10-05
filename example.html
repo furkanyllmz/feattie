@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify RAG Widget Demo</title>
+    <script src="http://localhost:8000/static/widget-loader.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        .hero {
+            background: white;
+            padding: 60px 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .product-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .product-card h3 {
+            margin: 0 0 12px 0;
+            color: #333;
+            font-size: 18px;
+        }
+        .product-card p {
+            color: #666;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        .price {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000;
+        }
+        .integration-guide {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+            border: 1px solid #e0e0e0;
+        }
+        .integration-guide h2 {
+            margin-top: 0;
+        }
+        code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+        pre {
+            background: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+        pre code {
+            border: none;
+            padding: 0;
+        }
+        .config-option {
+            margin: 16px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #000;
+        }
+        .config-option strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .widget-notice {
+            background: #000;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🛍️ Shopify RAG Widget Demo</h1>
+        <p class="subtitle">AI destekli ürün danışmanı - Web sitenize tek satırla ekleyin!</p>
+        <p>👉 Sağ alt köşedeki chat butonuna tıklayarak deneyin</p>
+    </div>
+
+    <h2>Örnek Ürünler</h2>
+    <div class="products">
+        <div class="product-card">
+            <h3>HOODIE 501 - Black</h3>
+            <p>LES BENJAMINS x PlayStation</p>
+            <p>Siyah kapüşonlu sweatshirt</p>
+            <div class="price">4,499 TL</div>
+        </div>
+        <div class="product-card">
+            <h3>SWEATSHIRT 502 - Blue</h3>
+            <p>LES BENJAMINS x PlayStation</p>
+            <p>Mavi sweatshirt</p>
+            <div class="price">3,999 TL</div>
+        </div>
+        <div class="product-card">
+            <h3>PANT 408 - Navy</h3>
+            <p>LES BENJAMINS CLASSICS</p>
+            <p>Lacivert pantolon</p>
+            <div class="price">7,999 TL</div>
+        </div>
+    </div>
+
+    <div class="integration-guide">
+        <h2>🚀 Entegrasyon Kılavuzu</h2>
+
+        <h3>1. Tek Satırla Kurulum</h3>
+        <p>Web sitenizin <code>&lt;head&gt;</code> veya <code>&lt;body&gt;</code> bölümüne bu kodu ekleyin:</p>
+        <pre><code>&lt;script src="http://localhost:8000/static/widget-loader.js"&gt;&lt;/script&gt;</code></pre>
+
+        <h3>2. Özelleştirme (Opsiyonel)</h3>
+        <p>Widget'ı özelleştirmek için script'ten önce bu değişkenleri tanımlayın:</p>
+
+        <div class="config-option">
+            <strong>API URL</strong>
+            <code>window.SHOPIFY_RAG_API_URL = 'http://your-server:8000';</code>
+        </div>
+
+        <div class="config-option">
+            <strong>Pozisyon</strong>
+            <code>window.SHOPIFY_RAG_POSITION = 'bottom-right';</code>
+            <small style="display: block; margin-top: 4px; color: #666;">Seçenekler: 'bottom-right', 'bottom-left'</small>
+        </div>
+
+        <div class="config-option">
+            <strong>Ana Renk</strong>
+            <code>window.SHOPIFY_RAG_COLOR = '#000000';</code>
+        </div>
+
+        <div class="config-option">
+            <strong>Başlık</strong>
+            <code>window.SHOPIFY_RAG_TITLE = 'Ürün Danışmanı';</code>
+        </div>
+
+        <div class="config-option">
+            <strong>Buton İkonu</strong>
+            <code>window.SHOPIFY_RAG_BUTTON_TEXT = '💬';</code>
+        </div>
+
+        <h3>3. Tam Örnek</h3>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Store&lt;/title&gt;
+
+    &lt;!-- Widget Konfigürasyonu --&gt;
+    &lt;script&gt;
+        window.SHOPIFY_RAG_API_URL = 'http://your-server:8000';
+        window.SHOPIFY_RAG_COLOR = '#FF6B6B';
+        window.SHOPIFY_RAG_TITLE = 'Ürün Asistanı';
+    &lt;/script&gt;
+
+    &lt;!-- Widget Loader --&gt;
+    &lt;script src="http://localhost:8000/static/widget-loader.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Sitenizin içeriği --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <h3>4. Shopify'da Kullanım</h3>
+        <p>Shopify admin panelinde:</p>
+        <ol>
+            <li><strong>Online Store</strong> → <strong>Themes</strong></li>
+            <li><strong>Actions</strong> → <strong>Edit code</strong></li>
+            <li><code>theme.liquid</code> dosyasını açın</li>
+            <li><code>&lt;/head&gt;</code> etiketinden önce widget script'ini ekleyin</li>
+            <li>Kaydedin ve yayınlayın!</li>
+        </ol>
+    </div>
+
+    <div class="widget-notice">
+        ✨ Widget şu anda bu sayfada çalışıyor! Sağ alttaki chat butonuna tıklayın.
+    </div>
+
+    <!-- Widget Integration - EXAMPLE -->
+    <script>
+        // Customize widget
+        window.SHOPIFY_RAG_API_URL = 'http://localhost:8000';
+        window.SHOPIFY_RAG_COLOR = '#000000';
+        window.SHOPIFY_RAG_TITLE = 'Ürün Danışmanı';
+        window.SHOPIFY_RAG_POSITION = 'bottom-right';
+    </script>
+    <script src="http://localhost:8000/static/widget-loader.js"></script>
+</body>
+</html>

@@ -1,2 +1,34 @@
-.venv/
+# Environment variables
+.env
 
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Output files
+out/
+*.jsonl
+products_rag.jsonl
+products_sot.jsonl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
