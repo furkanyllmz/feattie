@@ -1,4 +1,14 @@
-using System.Text;
+using System.T// CORS (set frontend origi        // Don't automatically read from header since we'll store in cookie; we'll validate manually.
+        o.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = ctx =>
+            {
+                // Extract token from HttpOnly cookie "jwt"
+                if (ctx.Request.Cookies.TryGetValue("jwt", out var token))
+                    ctx.Token = token;
+                return Task.CompletedTask;
+            }
+        };gin = cfg["Cors:AllowedOrigin"]!;t;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,7 +73,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 var app = builder.Build();
 
-// Development ortamında Swagger'ı aktifleştir
+// Enable Swagger in Development environment
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -76,7 +86,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Basit seeding
+// Simple seeding
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -87,10 +97,10 @@ using (var scope = app.Services.CreateScope())
         var hash = BCrypt.Net.BCrypt.HashPassword("Admin123!");
         db.Users.Add(new User { Email = "admin@example.com", PasswordHash = hash, Role = Role.ADMIN });
         db.SaveChanges();
-        Console.WriteLine("Admin hazır: admin@example.com / Admin123!");
+        Console.WriteLine("Admin ready: admin@example.com / Admin123!");
     }
 
-    // Test verilerini oluştur
+    // Create test data
     if (db.Users.Count() < 5)
     {
         var testUsers = new List<User>
@@ -186,7 +196,7 @@ using (var scope = app.Services.CreateScope())
                 IsActive = false,
                 EmailVerified = true,
                 IsBanned = true,
-                BanReason = "Spam gönderme",
+                BanReason = "Sending spam",
                 BannedAt = DateTime.UtcNow.AddDays(-5),
                 BanExpires = DateTime.UtcNow.AddDays(25),
                 CreatedAt = DateTime.UtcNow.AddDays(-12)
@@ -201,7 +211,7 @@ using (var scope = app.Services.CreateScope())
                 IsActive = false,
                 EmailVerified = true,
                 IsBanned = true,
-                BanReason = "Uygunsuz davranış - geçici yasak",
+                BanReason = "Inappropriate behavior - temporary ban",
                 BannedAt = DateTime.UtcNow.AddDays(-2),
                 BanExpires = DateTime.UtcNow.AddDays(5),
                 CreatedAt = DateTime.UtcNow.AddDays(-6)
@@ -229,10 +239,10 @@ using (var scope = app.Services.CreateScope())
         }
 
         db.SaveChanges();
-        Console.WriteLine($"✅ Test verileri oluşturuldu! Toplam {db.Users.Count()} kullanıcı mevcut.");
-        Console.WriteLine("📊 Admin: 3, Normal: 7 kullanıcı");
-        Console.WriteLine("🚫 2 yasaklı, 1 pasif kullanıcı");
-        Console.WriteLine("🔑 Tüm şifreler: Test123!");
+        Console.WriteLine($"✅ Test data created! Total of {db.Users.Count()} users available.");
+        Console.WriteLine("📊 Admin: 3, Normal: 7 users");
+        Console.WriteLine("🚫 2 banned, 1 inactive user");
+        Console.WriteLine("🔑 All passwords: Test123!");
     }
 }
 

@@ -10,24 +10,24 @@ public class User
     public Role Role { get; set; } = Role.USER;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    // Profil bilgileri
+    // Profile info
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public bool EmailVerified { get; set; } = false;
-    
-    // Şifre sıfırlama
+
+    // Password reset
     public string? PasswordResetToken { get; set; }
     public DateTime? PasswordResetExpires { get; set; }
-    
-    // Email doğrulama
+
+    // Email verification
     public string? EmailVerificationToken { get; set; }
     public DateTime? EmailVerificationExpires { get; set; }
-    
-    // Hesap durumu
+
+    // Account status
     public bool IsActive { get; set; } = true;
     public DateTime? LastLoginAt { get; set; }
-    
-    // Ban sistemi
+
+    // Ban system
     public bool IsBanned { get; set; } = false;
     public string? BanReason { get; set; }
     public DateTime? BanExpires { get; set; }

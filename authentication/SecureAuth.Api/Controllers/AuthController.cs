@@ -12,21 +12,21 @@ using SecureAuth.Api.Models;
 namespace SecureAuth.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[c            Secure = true,             // set false temporarily if no HTTPS in devntroller]")]
 public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest(new { error = "email ve password gerekli" });
+            return BadRequest(new { error = "email and password required" });
 
         var email = dto.Email.Trim().ToLowerInvariant();
         if (await db.Users.AnyAsync(u => u.Email == email))
-            return Conflict(new { error = "email kullanımda" });
+            return Conflict(new { error = "email already in use" });
 
         if (dto.Password.Length < 6)
-            return BadRequest(new { error = "şifre en az 6 karakter" });
+            return BadRequest(new { error = "password must be at least 6 characters" });
 
         var hash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
         var user = new User { Email = email, PasswordHash = hash, Role = Role.USER };
@@ -42,17 +42,17 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         var email = (dto.Email ?? "").Trim().ToLowerInvariant();
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user is null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-            return Unauthorized(new { error = "geçersiz kimlik" });
+            return Unauthorized(new { error = "invalid credentials" });
 
         if (!user.IsActive)
-            return Unauthorized(new { error = "hesap deaktif" });
+            return Unauthorized(new { error = "account deactivated" });
 
-        // Ban kontrolü
+        // Ban check
         if (user.IsBanned)
         {
             if (user.BanExpires.HasValue && user.BanExpires.Value <= DateTime.UtcNow)
             {
-                // Ban süresi dolmuş, otomatik kaldır
+                // Ban period expired, automatically remove
                 user.IsBanned = false;
                 user.BanReason = null;
                 user.BanExpires = null;
@@ -63,13 +63,13 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             else
             {
                 var banMessage = user.BanExpires.HasValue 
-                    ? $"Hesabınız {user.BanExpires.Value:dd.MM.yyyy HH:mm} tarihine kadar yasaklı. Sebep: {user.BanReason}"
-                    : $"Hesabınız kalıcı olarak yasaklandı. Sebep: {user.BanReason}";
+                    ? $"Your account is banned until {user.BanExpires.Value:dd.MM.yyyy HH:mm}. Reason: {user.BanReason}"
+                    : $"Your account is permanently banned. Reason: {user.BanReason}";
                 return Unauthorized(new { error = banMessage });
             }
         }
 
-        // Son giriş zamanını güncelle
+        // Update last login time
         user.LastLoginAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
@@ -107,7 +107,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         return Ok(new { ok = true });
     }
 
-    // *** Şifre Yönetimi API'leri ***
+    // *** Password Management APIs ***
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
@@ -115,19 +115,19 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
         
         if (user is null)
-            return Ok(new { message = "Eğer email kayıtlıysa, sıfırlama linki gönderildi." });
+            return Ok(new { message = "If the email is registered, a reset link has been sent." });
 
-        // Reset token oluştur
+        // Create reset token
         var resetToken = Guid.NewGuid().ToString();
         user.PasswordResetToken = resetToken;
-        user.PasswordResetExpires = DateTime.UtcNow.AddHours(1); // 1 saat geçerli
+        user.PasswordResetExpires = DateTime.UtcNow.AddHours(1); // Valid for 1 hour
         
         await db.SaveChangesAsync();
         
         // TODO: Email gönderme servisi buraya eklenecek
         // EmailService.SendPasswordReset(user.Email, resetToken);
         
-        return Ok(new { message = "Eğer email kayıtlıysa, sıfırlama linki gönderildi." });
+        return Ok(new { message = "If the email is registered, a reset link has been sent." });
     }
 
     [HttpPost("reset-password")]
@@ -140,19 +140,19 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             u.PasswordResetExpires > DateTime.UtcNow);
 
         if (user is null)
-            return BadRequest(new { error = "Geçersiz veya süresi dolmuş token" });
+            return BadRequest(new { error = "Invalid or expired token" });
 
         if (dto.NewPassword.Length < 6)
-            return BadRequest(new { error = "Şifre en az 6 karakter olmalı" });
+            return BadRequest(new { error = "Password must be at least 6 characters" });
 
-        // Şifreyi güncelle
+        // Update password
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         user.PasswordResetToken = null;
         user.PasswordResetExpires = null;
         
         await db.SaveChangesAsync();
         
-        return Ok(new { message = "Şifre başarıyla sıfırlandı" });
+        return Ok(new { message = "Password successfully reset" });
     }
 
     [Authorize]
@@ -167,21 +167,21 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         if (user is null)
             return NotFound();
 
-        // Mevcut şifreyi doğrula
+        // Verify current password
         if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
-            return BadRequest(new { error = "Mevcut şifre yanlış" });
+            return BadRequest(new { error = "Current password is incorrect" });
 
         if (dto.NewPassword.Length < 6)
-            return BadRequest(new { error = "Yeni şifre en az 6 karakter olmalı" });
+            return BadRequest(new { error = "New password must be at least 6 characters" });
 
-        // Yeni şifreyi kaydet
+        // Save new password
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         await db.SaveChangesAsync();
         
-        return Ok(new { message = "Şifre başarıyla değiştirildi" });
+        return Ok(new { message = "Password successfully changed" });
     }
 
-    // *** Profil Yönetimi API'leri ***
+    // *** Profile Management APIs ***
     [Authorize]
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
@@ -194,21 +194,21 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         if (user is null)
             return NotFound();
 
-        // Email değişikliği kontrolü
+        // Email change check
         if (!string.IsNullOrWhiteSpace(dto.Email))
         {
             var newEmail = dto.Email.Trim().ToLowerInvariant();
             if (newEmail != user.Email)
             {
                 if (await db.Users.AnyAsync(u => u.Email == newEmail && u.Id != uid))
-                    return Conflict(new { error = "Bu email başka kullanıcı tarafından kullanılıyor" });
+                    return Conflict(new { error = "This email is being used by another user" });
                 
                 user.Email = newEmail;
-                user.EmailVerified = false; // Email değiştirildiğinde doğrulama sıfırlanır
+                user.EmailVerified = false; // Reset verification when email is changed
             }
         }
 
-        // Profil bilgilerini güncelle
+        // Update profile information
         if (dto.FirstName is not null) user.FirstName = dto.FirstName.Trim();
         if (dto.LastName is not null) user.LastName = dto.LastName.Trim();
         
@@ -231,16 +231,16 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
     {
         var user = await db.Users.FindAsync(id);
         if (user is null)
-            return NotFound(new { error = "Kullanıcı bulunamadı" });
+            return NotFound(new { error = "User not found" });
 
         if (!Enum.IsDefined(typeof(Role), dto.Role))
-            return BadRequest(new { error = "Geçersiz rol" });
+            return BadRequest(new { error = "Invalid role" });
 
         user.Role = (Role)dto.Role;
         await db.SaveChangesAsync();
 
         return Ok(new { 
-            message = $"Kullanıcı rolü {(Role)dto.Role} olarak güncellendi",
+            message = $"User role updated to {(Role)dto.Role}",
             user = new { user.Id, user.Email, user.Role }
         });
     }
@@ -251,10 +251,10 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
     {
         var user = await db.Users.FindAsync(id);
         if (user is null)
-            return NotFound(new { error = "Kullanıcı bulunamadı" });
+            return NotFound(new { error = "User not found" });
 
         if (user.Role == Role.ADMIN)
-            return BadRequest(new { error = "Admin kullanıcılar yasaklanamaz" });
+            return BadRequest(new { error = "Admin users cannot be banned" });
 
         user.IsBanned = true;
         user.BanReason = dto.Reason;
@@ -264,9 +264,9 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
 
         await db.SaveChangesAsync();
 
-        var banDuration = dto.DurationDays > 0 ? $"{dto.DurationDays} gün" : "kalıcı";
+        var banDuration = dto.DurationDays > 0 ? $"{dto.DurationDays} days" : "permanent";
         return Ok(new { 
-            message = $"Kullanıcı {banDuration} süreyle yasaklandı",
+            message = $"User banned for {banDuration}",
             banExpires = user.BanExpires
         });
     }
@@ -277,7 +277,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
     {
         var user = await db.Users.FindAsync(id);
         if (user is null)
-            return NotFound(new { error = "Kullanıcı bulunamadı" });
+            return NotFound(new { error = "User not found" });
 
         user.IsBanned = false;
         user.BanReason = null;
@@ -287,7 +287,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
 
         await db.SaveChangesAsync();
 
-        return Ok(new { message = "Kullanıcı yasağı kaldırıldı" });
+        return Ok(new { message = "User ban removed" });
     }
 
     [Authorize(Policy = "AdminOnly")]
@@ -310,13 +310,13 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             activeUsers,
             bannedUsers,
             adminUsers,
-            recentUsers, // Son 30 gün
+            recentUsers, // Last 30 days
             todayLogins
         });
     }
 
     /// <summary>
-    /// Kullanıcı Listesi - Kullanıcı ID'lerini bulmak için kullanın
+    /// User List - Use to find User IDs
     /// </summary>
     [Authorize(Policy = "AdminOnly")]
     [HttpGet("admin/users")]
@@ -327,7 +327,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
     {
         var query = db.Users.AsQueryable();
 
-        // Arama filtresi
+        // Search filter
         if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.ToLower();
@@ -343,7 +343,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(u => new {
-                ID = u.Id, // Büyük harfle vurgulu
+                ID = u.Id, // Capitalized for emphasis
                 Email = u.Email,
                 FullName = $"{u.FirstName} {u.LastName}".Trim(),
                 Role = u.Role.ToString(),
@@ -358,7 +358,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             .ToListAsync();
 
         return Ok(new {
-            message = "💡 ID sütunundaki sayıları kullanarak diğer admin API'lerini test edin",
+            message = "💡 Use the numbers in the ID column to test other admin APIs",
             users,
             pagination = new {
                 page,
@@ -367,9 +367,9 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
                 totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
             },
             howToUse = new {
-                roleChange = "PUT /admin/users/{ID}/role ile rol değiştirin",
-                banUser = "POST /admin/users/{ID}/ban ile yasaklayın",
-                unbanUser = "POST /admin/users/{ID}/unban ile yasağı kaldırın"
+                roleChange = "PUT /admin/users/{ID}/role to change role",
+                banUser = "POST /admin/users/{ID}/ban to ban",
+                unbanUser = "POST /admin/users/{ID}/unban to remove ban"
             }
         });
     }

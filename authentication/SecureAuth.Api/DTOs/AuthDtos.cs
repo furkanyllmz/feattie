@@ -3,7 +3,7 @@ namespace SecureAuth.Api.DTOs;
 public record RegisterDto(string Email, string Password);
 public record LoginDto(string Email, string Password);
 
-// Şifre yönetimi
+// Password management
 public record ForgotPasswordDto(string Email);
 public record ResetPasswordDto(string Email, string Token, string NewPassword);
 public record ChangePasswordDto(string CurrentPassword, string NewPassword);
