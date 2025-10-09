@@ -3647,11 +3647,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/macbook/Desktop/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
+      "projectUniqueName": "/Users/macbook/Documents/GitHub/feattie/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
       "projectName": "SecureAuth.Api",
-      "projectPath": "/Users/macbook/Desktop/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
+      "projectPath": "/Users/macbook/Documents/GitHub/feattie/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Users/macbook/Desktop/authentication/SecureAuth.Api/obj/",
+      "outputPath": "/Users/macbook/Documents/GitHub/feattie/authentication/SecureAuth.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/.nuget/NuGet/NuGet.Config"

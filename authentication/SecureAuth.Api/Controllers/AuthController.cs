@@ -12,7 +12,7 @@ using SecureAuth.Api.Models;
 namespace SecureAuth.Api.Controllers;
 
 [ApiController]
-[Route("api/[c            Secure = true,             // set false temporarily if no HTTPS in devntroller]")]
+[Route("api/[controller]")]
 public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBase
 {
     [HttpPost("register")]
@@ -402,7 +402,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         Response.Cookies.Append("jwt", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,             // dev’de HTTPS yoksa geçici olarak false yapabilirsin
+            Secure = true,             
             SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddMinutes(int.Parse(cfg["Jwt:ExpiresMinutes"]!))
         });

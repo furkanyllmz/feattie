@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "authentication", "authentication", "{4695A4CC-2808-B473-78D8-BE303A4A5026}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecureAuth.Api", "authentication\SecureAuth.Api\SecureAuth.Api.csproj", "{5F22C681-1F3A-E238-448F-8929240763E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F22C681-1F3A-E238-448F-8929240763E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F22C681-1F3A-E238-448F-8929240763E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F22C681-1F3A-E238-448F-8929240763E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F22C681-1F3A-E238-448F-8929240763E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5F22C681-1F3A-E238-448F-8929240763E6} = {4695A4CC-2808-B473-78D8-BE303A4A5026}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE7A54C1-9370-454A-A6A6-4AF1C1840A0A}
+	EndGlobalSection
+EndGlobal

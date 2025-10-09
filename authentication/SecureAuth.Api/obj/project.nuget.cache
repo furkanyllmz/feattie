@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "t/KIVwL4OfI=",
+  "dgSpecHash": "WsgpiA2xzn8=",
   "success": true,
-  "projectFilePath": "/Users/macbook/Desktop/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
+  "projectFilePath": "/Users/macbook/Documents/GitHub/feattie/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/macbook/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
