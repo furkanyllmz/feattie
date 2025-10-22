@@ -103,7 +103,8 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("jwt", new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict });
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+        Response.Cookies.Delete("jwt", new CookieOptions { HttpOnly = true, Secure = !isDevelopment, SameSite = SameSiteMode.Strict });
         return Ok(new { ok = true });
     }
 
@@ -399,10 +400,12 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
 
     private void SetJwtCookie(string token, IConfiguration cfg)
     {
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
         Response.Cookies.Append("jwt", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,             
+            Secure = !isDevelopment, // HTTP için false, production'da true
             SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddMinutes(int.Parse(cfg["Jwt:ExpiresMinutes"]!))
         });

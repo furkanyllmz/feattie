@@ -3,8 +3,12 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import ChatPage from './components/Chat/ChatPage';
 import ChatWidget from './components/Chat/ChatWidget';
-
 import IntegrationPage from './components/Documentation/IntegrationPage';
+import LoginPage from './pages/LoginPage';
+import AdminDashboard from './pages/AdminDashboard';
+import DashboardHome from './pages/admin/DashboardHome';
+import TenantsPage from './pages/admin/TenantsPage';
+import ChatTestPage from './pages/admin/ChatTestPage';
 import './App.css'
 
 const Navigation = styled.nav`
@@ -123,6 +127,7 @@ export function App() {
       </Navigation>
 
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={
           <MainContainer>
             <ContentWrapper>
@@ -136,6 +141,14 @@ export function App() {
           <ChatPage theme={theme} onThemeChange={setTheme} />
         } />
         <Route path="/docs" element={<IntegrationPage />} />
+
+        {/* Admin routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminDashboard />}>
+          <Route index element={<DashboardHome />} />
+          <Route path="tenants" element={<TenantsPage />} />
+          <Route path="chat-test" element={<ChatTestPage />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -32,4 +32,7 @@ public class User
     public string? BanReason { get; set; }
     public DateTime? BanExpires { get; set; }
     public DateTime? BannedAt { get; set; }
+
+    // Multi-tenant relationships
+    public ICollection<TenantUser> TenantUsers { get; set; } = new List<TenantUser>();
 }

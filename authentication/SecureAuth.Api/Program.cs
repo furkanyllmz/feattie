@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SecureAuth.Api.Data;
 using SecureAuth.Api.Models;
+using SecureAuth.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var cfg = builder.Configuration;
@@ -11,6 +12,11 @@ var cfg = builder.Configuration;
 // Db
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(cfg.GetConnectionString("Default")));
+
+// Services
+builder.Services.AddHttpClient<IShopifyService, ShopifyService>();
+builder.Services.AddHttpClient<IPythonRAGService, PythonRAGService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // CORS (frontend origin’i ayarla)
 var origin = cfg["Cors:AllowedOrigin"]!;
@@ -233,6 +239,24 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("📊 Admin: 3, Normal: 7 kullanıcı");
         Console.WriteLine("🚫 2 yasaklı, 1 pasif kullanıcı");
         Console.WriteLine("🔑 Tüm şifreler: Test123!");
+    }
+
+    // Create default tenant for testing
+    if (!db.Tenants.Any())
+    {
+        var defaultTenant = new Tenant
+        {
+            Name = "Test Mağaza",
+            Slug = "test-magaza",
+            ShopifyStoreUrl = "https://test-shop.myshopify.com",
+            IsActive = true,
+            MaxProducts = 1000,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        db.Tenants.Add(defaultTenant);
+        await db.SaveChangesAsync();
+        Console.WriteLine("🏪 Default tenant created: test-magaza");
     }
 }
 
