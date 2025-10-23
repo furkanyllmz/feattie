@@ -18,15 +18,22 @@ builder.Services.AddHttpClient<IShopifyService, ShopifyService>();
 builder.Services.AddHttpClient<IPythonRAGService, PythonRAGService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
-// CORS (frontend origin’i ayarla)
+// CORS (frontend origin'i ayarla)
 var origin = cfg["Cors:AllowedOrigin"]!;
 builder.Services.AddCors(opt =>
 {
+    // Policy for frontend admin panel
     opt.AddPolicy("frontend", p => p
         .WithOrigins(origin)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
+
+    // Policy for public widget (allow any origin for embeddable widget)
+    opt.AddPolicy("widget", p => p
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 });
 
 // JWT
@@ -66,7 +73,12 @@ builder.Services.AddAuthorization(o =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Use camelCase for JSON serialization (role instead of Role)
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 var app = builder.Build();
 
 // Development ortamında Swagger'ı aktifleştir
@@ -77,6 +89,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("frontend");
+app.UseStaticFiles(); // Enable serving static files from wwwroot
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -22,8 +22,8 @@ fi
 
 echo ""
 echo "🚀 To start the services:"
-echo "1. Start the Python RAG service: cd /Users/furkanyilmaz/Desktop/feattie && python -m src.api.tenant_server"
-echo "2. Start the .NET API: cd /Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api && dotnet run"
+echo "1. Start the Python RAG service: cd feattie && python -m src.api.tenant_server"
+echo "2. Start the .NET API: cd feattie/authentication/SecureAuth.Api && dotnet run"
 echo ""
 echo "📝 Test the setup:"
-echo "curl -X GET http://localhost:5000/api/tenants/1/rag-config"
+echo "curl -X GET http://localhost:5078/api/tenants/1/settings"

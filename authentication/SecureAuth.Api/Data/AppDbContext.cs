@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     // Multi-tenant RAG system
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<TenantUser> TenantUsers => Set<TenantUser>();
+    public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<RAGConfiguration> RAGConfigurations => Set<RAGConfiguration>();
     public DbSet<Context> Contexts => Set<Context>();
@@ -132,5 +133,27 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
          .WithMany(cs => cs.Messages)
          .HasForeignKey(cm => cm.ChatSessionId)
          .OnDelete(DeleteBehavior.Cascade);
+
+        // === TENANT SETTINGS CONFIGURATION ===
+        b.Entity<TenantSettings>()
+         .HasOne(ts => ts.Tenant)
+         .WithOne(t => t.Settings)
+         .HasForeignKey<TenantSettings>(ts => ts.TenantId)
+         .OnDelete(DeleteBehavior.Cascade);
+
+        b.Entity<TenantSettings>()
+         .Property(ts => ts.ChatTitle)
+         .HasMaxLength(100)
+         .IsRequired();
+
+        b.Entity<TenantSettings>()
+         .Property(ts => ts.BrandColorPrimary)
+         .HasMaxLength(7)
+         .IsRequired();
+
+        b.Entity<TenantSettings>()
+         .Property(ts => ts.BrandColorSecondary)
+         .HasMaxLength(7)
+         .IsRequired();
     }
 }

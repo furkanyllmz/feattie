@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecureAuth.Api.Data;
@@ -39,6 +40,7 @@ public class ChatController : ControllerBase
     /// </summary>
     [HttpPost("{tenantId}")]
     [AllowAnonymous]
+    [EnableCors("widget")]
     public async Task<ActionResult> SendMessage(
         int tenantId,
         [FromBody] ChatRequest request)

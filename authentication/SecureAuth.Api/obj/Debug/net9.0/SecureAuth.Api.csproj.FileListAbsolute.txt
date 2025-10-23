@@ -423,3 +423,5 @@
 /Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/obj/Debug/net9.0/SecureAuth.Api.pdb
 /Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/obj/Debug/net9.0/SecureAuth.Api.genruntimeconfig.cache
 /Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/obj/Debug/net9.0/ref/SecureAuth.Api.dll
+/Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/bin/Debug/net9.0/SecureAuth.Api.staticwebassets.runtime.json
+/Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/obj/Debug/net9.0/compressed/vsyn7e34b2-239y6npjo2.gz

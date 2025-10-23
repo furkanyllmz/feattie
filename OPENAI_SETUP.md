@@ -35,19 +35,21 @@ $env:OPENAI_API_KEY="your-api-key-here"
 
 #### Python RAG Servisi:
 ```bash
-cd /Users/furkanyilmaz/Desktop/feattie
+# Project root directory'ye gidin
+cd feattie
 python -m src.api.tenant_server
 ```
 
 #### .NET API Servisi:
 ```bash
-cd /Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api
+# Project root directory'den
+cd authentication/SecureAuth.Api
 dotnet run
 ```
 
 ### 4. Kurulumu Test Edin
 ```bash
-cd /Users/furkanyilmaz/Desktop/feattie
+# Project root directory'den
 python test_openai_setup.py
 ```
 

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5078';
 
@@ -157,6 +157,22 @@ class ApiService {
       sessionId,
       topK: 3,
     });
+    return response.data;
+  }
+
+  // === TENANT SETTINGS ===
+  async getTenantSettings(tenantId: number) {
+    const response = await this.api.get(`/api/tenants/${tenantId}/settings`);
+    return response.data;
+  }
+
+  async updateTenantSettings(tenantId: number, data: any) {
+    const response = await this.api.put(`/api/tenants/${tenantId}/settings`, data);
+    return response.data;
+  }
+
+  async getEmbedCode(tenantId: number) {
+    const response = await this.api.get(`/api/tenants/${tenantId}/settings/embed-code`);
     return response.data;
   }
 }

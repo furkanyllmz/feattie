@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from '@emotion/styled';
 import api from '../../services/api';
 
@@ -219,6 +220,8 @@ const ErrorText = styled.span`
 `;
 
 export default function TenantsPage() {
+  const navigate = useNavigate();
+  const { user } = useOutletContext<{ user: any }>();
   const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Record<number, any>>({});
@@ -232,6 +235,9 @@ export default function TenantsPage() {
   });
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Check if user is admin (role === 1)
+  const isAdmin = user?.user?.role === 1;
 
   useEffect(() => {
     loadTenants();
@@ -350,7 +356,9 @@ export default function TenantsPage() {
     <Container>
       <Header>
         <h1 style={{ margin: 0 }}>Tenant Yönetimi</h1>
-        <Button onClick={() => setShowModal(true)}>+ Yeni Tenant</Button>
+        {isAdmin && (
+          <Button onClick={() => setShowModal(true)}>+ Yeni Tenant</Button>
+        )}
       </Header>
 
       {tenants.length === 0 ? (
@@ -405,13 +413,17 @@ export default function TenantsPage() {
                 </TenantInfo>
 
                 <Actions>
-                  <SmallButton onClick={() => handleSyncProducts(tenant.id)}>
-                    🔄 Sync Products
-                  </SmallButton>
-                  <SmallButton onClick={() => handleGenerateEmbeddings(tenant.id)}>
-                    ⚡ Generate Embeddings
-                  </SmallButton>
-                  <SmallButton onClick={() => alert('Ayarlar yakında!')}>
+                  {isAdmin && (
+                    <>
+                      <SmallButton onClick={() => handleSyncProducts(tenant.id)}>
+                        🔄 Sync Products
+                      </SmallButton>
+                      <SmallButton onClick={() => handleGenerateEmbeddings(tenant.id)}>
+                        ⚡ Generate Embeddings
+                      </SmallButton>
+                    </>
+                  )}
+                  <SmallButton onClick={() => navigate(`/admin/tenants/${tenant.id}/settings`)}>
                     ⚙️ Ayarlar
                   </SmallButton>
                 </Actions>

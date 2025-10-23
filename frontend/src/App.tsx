@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import DashboardHome from './pages/admin/DashboardHome';
 import TenantsPage from './pages/admin/TenantsPage';
+import TenantSettingsPage from './pages/admin/TenantSettingsPage';
 import ChatTestPage from './pages/admin/ChatTestPage';
 import './App.css'
 
@@ -147,6 +148,7 @@ export function App() {
         <Route path="/admin" element={<AdminDashboard />}>
           <Route index element={<DashboardHome />} />
           <Route path="tenants" element={<TenantsPage />} />
+          <Route path="tenants/:tenantId/settings" element={<TenantSettingsPage />} />
           <Route path="chat-test" element={<ChatTestPage />} />
         </Route>
       </Routes>

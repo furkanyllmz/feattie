@@ -120,7 +120,7 @@ export default function AdminDashboard() {
         </LogoutButton>
       </Sidebar>
       <Main>
-        <Outlet />
+        <Outlet context={{ user }} />
       </Main>
     </Container>
   );

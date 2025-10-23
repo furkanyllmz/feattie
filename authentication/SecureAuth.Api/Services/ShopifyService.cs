@@ -20,8 +20,16 @@ public class ShopifyService : IShopifyService
 
         try
         {
-            // Prepare temp directory
-            var projectRoot = "/Users/furkanyilmaz/Desktop/feattie";
+            // Get project root dynamically (goes up 3 levels from bin/Debug/net9.0)
+            var currentDir = Directory.GetCurrentDirectory();
+            var projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", ".."));
+
+            // If running from authentication/SecureAuth.Api, go up one more level
+            if (currentDir.Contains("SecureAuth.Api"))
+            {
+                projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", "..", ".."));
+            }
+
             var tempDir = Path.Combine(projectRoot, "temp_sync");
             if (Directory.Exists(tempDir))
             {

@@ -1,534 +1,537 @@
-# 🛍️ Shopify RAG Product Search & Recommendation System
+# 🤖 Feattie - Multi-Tenant AI Chat Assistant Platform
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)](https://fastapi.tiangolo.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-Enterprise-grade AI-powered product search and recommendation system using **RAG (Retrieval-Augmented Generation)** with flexible embedding providers and GPT-4 integration.
-
-## ✨ Key Features
-
-- 🔍 **Semantic Search**: Natural language product search in 100+ languages (Turkish, English, etc.)
-- 🤖 **AI Assistant**: GPT-4 powered product recommendations with context awareness
-- ⚡ **Flexible Embeddings**: Switch between OpenAI or local (sentence-transformers) embeddings
-- 🚀 **High Performance**: In-memory embedding cache, FastAPI async architecture
-- 💬 **Embeddable Widget**: One-line JavaScript integration for any website
-- 🔧 **Production Ready**: YAML config, Docker support, comprehensive error handling
-- 📊 **Scalable**: Handles 10,000+ products with sub-second response times
-
-## 🏗️ Architecture
-
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│   Widget    │─────▶│  FastAPI     │─────▶│  RAG Engine │
-│ (Frontend)  │      │   Server     │      │             │
-└─────────────┘      └──────────────┘      └─────────────┘
-                            │                      │
-                            ▼                      ▼
-                     ┌──────────────┐       ┌─────────────┐
-                     │   Assistant  │       │  Embeddings │
-                     │   (GPT-4)    │       │  (Flexible) │
-                     └──────────────┘       └─────────────┘
-                                                   │
-                                    ┌──────────────┴──────────────┐
-                                    ▼                             ▼
-                             ┌─────────────┐            ┌────────────────┐
-                             │   OpenAI    │            │  Sentence-     │
-                             │  Embeddings │            │  Transformers  │
-                             └─────────────┘            └────────────────┘
-```
-
-## 📁 Project Structure
-
-```
-feattie/
-├── src/                          # Source code
-│   ├── embeddings/               # Embedding providers
-│   │   ├── base.py              # Abstract interface
-│   │   ├── openai_embeddings.py # OpenAI provider
-│   │   └── local_embeddings.py  # Local provider
-│   ├── api/                     # API module
-│   │   └── server.py            # FastAPI server
-│   ├── rag_engine.py            # RAG search engine
-│   └── assistant.py             # LLM assistant
-├── config/                       # Configuration
-│   ├── config.yaml              # Main config file
-│   └── __init__.py              # Config loader
-├── static/js/                   # Frontend assets
-│   ├── widget.js                # Chat widget
-│   └── widget-loader.js         # Widget loader
-├── out/                         # Data files
-│   ├── products_rag.jsonl       # RAG-optimized data
-│   └── products_sot.jsonl       # Source of truth
-├── run.py                       # Main entry point
-├── shop_pull.py                 # Shopify data scraper
-├── requirements.txt             # Python dependencies
-├── .env.example                 # Environment template
-└── README.md                    # This file
-```
+**Embeddable AI-powered chat widgets for e-commerce businesses.** Each tenant gets their own customized AI assistant with product knowledge, semantic search, and branded chat interface.
 
 ---
 
-## 🚀 Quick Start
+## 📋 Quick Info
 
-### 1. Installation
+| Component | Technology | Port |
+|-----------|------------|------|
+| Frontend (Admin Panel) | React + TypeScript | 5173 |
+| Backend API | ASP.NET Core 9.0 | 5078 |
+| RAG Service | Python FastAPI | 8000 |
+| Database | PostgreSQL | 5432 |
+
+**Admin Login:**
+- Email: `admin@example.com`
+- Password: `Admin123!`
+
+---
+
+## ✨ Features
+
+### 🏢 Multi-Tenant Architecture
+- Isolated data per business (tenant)
+- Separate RAG configurations
+- Custom embeddings per tenant
+- Product sync from Shopify
+
+### 🎨 Customizable Widget
+- Brand colors (primary & secondary gradient)
+- Widget position (4 corners)
+- Custom chat title & welcome message
+- Auto-open settings
+- Widget size (small/medium/large)
+- Custom CSS support
+
+### 🔐 Role-Based Access Control
+- **Admin Role**: Full access
+  - Sync products from Shopify
+  - Generate embeddings
+  - Create/manage tenants
+  - View embed code
+  - Customize appearance
+
+- **User Role**: Limited access
+  - Customize appearance only
+  - No sync/embedding access
+  - No embed code access
+
+### 🤖 AI-Powered Chat
+- Semantic product search
+- Context-aware responses
+- Product recommendations with images
+- Session management
+- Multi-language support
+
+### 📦 Embeddable Widget
+- One-line JavaScript integration
+- CORS enabled for external domains
+- No authentication required
+- Customizable per tenant
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+- **Node.js 18+** and npm
+- **Python 3.11+**
+- **.NET 9.0 SDK**
+- **PostgreSQL 15+**
+
+### 1. Clone Repository
 
 ```bash
-# Clone/navigate to repository
+git clone <repository-url>
 cd feattie
+```
 
-# Create virtual environment
+### 2. Setup Database
+
+```bash
+# Option A: Docker
+docker run --name feattie-postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=feattie \
+  -p 5432:5432 \
+  -d postgres:15
+
+# Option B: Use existing PostgreSQL
+# Make sure database 'feattie' exists
+```
+
+### 3. Backend API Setup
+
+```bash
+cd authentication/SecureAuth.Api
+
+# Install dependencies
+dotnet restore
+
+# Update appsettings.json with your settings
+# (See Configuration section below)
+
+# Run migrations
+dotnet ef database update
+
+# Start API
+dotnet run
+```
+
+API available at: `http://localhost:5078`
+
+### 4. Python RAG Service Setup
+
+```bash
+# From project root
 python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Activate virtual environment
+# macOS/Linux:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-
-# Setup environment
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY (if using OpenAI)
+# Start RAG service
+export PYTHONPATH=$PWD  # macOS/Linux
+# Windows: set PYTHONPATH=%CD%
+python src/api/tenant_server.py
 ```
 
-### 2. Configure
+RAG service available at: `http://localhost:8000`
 
-Edit `config/config.yaml`:
-
-```yaml
-# Choose embedding provider
-embedding:
-  provider: "openai"  # or "local"
-
-  openai:
-    model: "text-embedding-3-large"
-
-  local:
-    model: "intfloat/multilingual-e5-large"
-    device: "cpu"  # or "cuda" for GPU
-```
-
-### 3. Fetch Products
+### 5. Frontend Setup
 
 ```bash
-python shop_pull.py --base-url https://your-shopify-store.com --outdir ./out
+cd frontend
+
+# Install dependencies
+npm install
+
+# Create .env file
+echo "VITE_API_URL=http://localhost:5078" > .env
+
+# Start development server
+npm run dev
 ```
 
-### 4. Start Server
-
-```bash
-python run.py
-```
-
-Server starts at: **http://localhost:8000**
-
-🎉 **Done!** Embeddings are created on first startup (~30-60 seconds) and cached in memory.
-
----
-
-## 📖 Usage
-
-### REST API
-
-#### Search Products
-
-```bash
-curl -X POST "http://localhost:8000/search" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "siyah hoodie playstation",
-    "top_k": 3,
-    "deduplicate": true
-  }'
-```
-
-**Response:**
-```json
-{
-  "query": "siyah hoodie playstation",
-  "results": [
-    {
-      "product_id": 7718603915343,
-      "title": "HOODIE 501 — Black / XS",
-      "vendor": "LES BENJAMINS",
-      "price": 4499.0,
-      "similarity": 0.625
-    }
-  ],
-  "count": 1
-}
-```
-
-#### Ask AI Assistant
-
-```bash
-curl -X POST "http://localhost:8000/ask" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "300 TL altında sweatshirt öner",
-    "top_k": 3
-  }'
-```
-
-#### Get Product IDs
-
-```bash
-curl -X POST "http://localhost:8000/product-ids" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "mavi pantolon", "top_k": 5}'
-```
-
-#### API Documentation
-
-Interactive docs: **http://localhost:8000/docs**
-
----
-
-### Python SDK
-
-```python
-from src.rag_engine import ProductRAG
-from src.assistant import ProductAssistant
-
-# Initialize with OpenAI embeddings
-rag = ProductRAG(
-    jsonl_path="./out/products_rag.jsonl",
-    embedding_provider="openai",
-    embedding_model="text-embedding-3-large"
-)
-
-# Or use local embeddings (free!)
-rag = ProductRAG(
-    jsonl_path="./out/products_rag.jsonl",
-    embedding_provider="local",
-    embedding_model="intfloat/multilingual-e5-large",
-    device="cpu"
-)
-
-# Create embeddings
-rag.create_embeddings()
-
-# Search
-results = rag.search("siyah hoodie playstation", top_k=3)
-for r in results:
-    print(f"{r['product']['title']} - {r['similarity']:.3f}")
-
-# Get IDs
-product_ids = rag.get_product_ids("mavi pantolon", top_k=5)
-
-# AI Assistant
-assistant = ProductAssistant(rag, model="gpt-4o-mini")
-response = assistant.ask("500 TL altında ürün öner")
-print(response)
-```
-
----
-
-### Chat Widget Integration
-
-#### One-Line Integration
-
-Add to your website's `<head>` or `<body>`:
-
-```html
-<script src="http://localhost:8000/static/js/widget-loader.js"></script>
-```
-
-#### Customization
-
-```html
-<script>
-  window.SHOPIFY_RAG_API_URL = 'https://your-api-server.com';
-  window.SHOPIFY_RAG_COLOR = '#FF6B6B';
-  window.SHOPIFY_RAG_TITLE = 'Product Assistant';
-  window.SHOPIFY_RAG_POSITION = 'bottom-right';
-</script>
-<script src="https://your-api-server.com/static/js/widget-loader.js"></script>
-```
-
-#### Shopify Integration
-
-1. **Online Store** → **Themes** → **Actions** → **Edit code**
-2. Open `theme.liquid`
-3. Add before `</head>`:
-   ```liquid
-   <script src="{{ 'https://your-api-server.com/static/js/widget-loader.js' }}"></script>
-   ```
-4. Save and publish
+Frontend available at: `http://localhost:5173`
 
 ---
 
 ## ⚙️ Configuration
 
-### Embedding Providers
+### Backend API (`authentication/SecureAuth.Api/appsettings.json`)
 
-#### OpenAI (Best Quality, Paid)
-
-```yaml
-embedding:
-  provider: "openai"
-  openai:
-    model: "text-embedding-3-large"  # Best quality
-    # model: "text-embedding-3-small"  # Cheaper alternative
-    batch_size: 100
+```json
+{
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5432;Database=feattie;Username=postgres;Password=postgres"
+  },
+  "Jwt": {
+    "Secret": "your-super-secret-jwt-key-minimum-32-characters-required",
+    "Issuer": "SecureAuth.Api",
+    "Audience": "SecureAuth.Client",
+    "ExpiryMinutes": 60
+  },
+  "Cors": {
+    "AllowedOrigin": "http://localhost:5173"
+  },
+  "PythonRAG": {
+    "BaseUrl": "http://localhost:8000"
+  },
+  "OpenAI": {
+    "ApiKey": "sk-your-openai-api-key-here"
+  }
+}
 ```
 
-**Pros:**
-- ✅ Best quality for multilingual search
-- ✅ No GPU required
-- ✅ Fast API responses
+### Frontend (`.env` in `frontend/` folder)
 
-**Cons:**
-- ❌ Costs ~$0.52 for initial embedding (12k products)
-- ❌ ~$0.0001 per query
-
-#### Local (Free, Private)
-
-```yaml
-embedding:
-  provider: "local"
-  local:
-    model: "intfloat/multilingual-e5-large"  # Best quality
-    # model: "paraphrase-multilingual-mpnet-base-v2"  # Alternative
-    batch_size: 32
-    device: "cpu"  # or "cuda"
+```env
+VITE_API_URL=http://localhost:5078
 ```
-
-**Pros:**
-- ✅ **$0 cost** - completely free!
-- ✅ Privacy - data stays local
-- ✅ Offline capability
-
-**Cons:**
-- ❌ Requires 8GB+ RAM
-- ❌ Slower without GPU
-- ❌ First-time model download (~2GB)
-
-### Recommended Models
-
-| Provider | Model | Quality | Speed | Cost | Best For |
-|----------|-------|---------|-------|------|----------|
-| OpenAI | text-embedding-3-large | ⭐⭐⭐⭐⭐ | ⚡⚡⚡⚡ | $$ | Production |
-| OpenAI | text-embedding-3-small | ⭐⭐⭐⭐ | ⚡⚡⚡⚡⚡ | $ | Budget prod |
-| Local | intfloat/multilingual-e5-large | ⭐⭐⭐⭐⭐ | ⚡⚡⚡ | Free | Development |
-| Local | paraphrase-multilingual-mpnet-base-v2 | ⭐⭐⭐⭐ | ⚡⚡⚡⚡ | Free | Development |
 
 ---
 
-## 💰 Cost Estimation
+## 📖 Usage Guide
 
-### OpenAI Embeddings
+### 1. Login
 
-| Operation | Cost (12k products) |
-|-----------|---------------------|
-| Initial embedding creation | ~$0.52 |
-| Per query embedding | ~$0.0001 |
-| GPT-4o-mini response | ~$0.001-0.003 |
+1. Go to `http://localhost:5173/login`
+2. Login with:
+   - Email: `admin@example.com`
+   - Password: `Admin123!`
 
-**Monthly cost (1000 queries):** ~$3-5
+### 2. Create a Tenant
 
-### Local Embeddings
+1. Navigate to **Tenant Yönetimi**
+2. Click **+ Yeni Tenant**
+3. Fill in:
+   - **Name**: Your business name (e.g., "My Store")
+   - **Slug**: Auto-generated from name
+   - **Shopify Store URL**: Your Shopify store URL
+   - **Shopify Access Token**: (Optional for now)
+   - **Max Products**: Default 10000
+4. Click **Oluştur**
 
-| Operation | Cost |
-|-----------|------|
-| Everything | **$0** (Free!) |
+### 3. Sync Products
 
-**Hardware requirements:** 8GB RAM minimum, GPU recommended for >10k products
+1. Find your tenant in the list
+2. Click **🔄 Sync Products**
+3. Wait for sync to complete
+4. Products will appear in stats
 
-### 💡 Recommended: Local Embedding + OpenAI LLM
+### 4. Generate Embeddings
 
-**Best of both worlds:**
-- Embedding: Local (free)
-- LLM responses: OpenAI ($0.002/query)
-- **Total: ~$2/month for 1000 queries**
+1. After products sync, click **⚡ Generate Embeddings**
+2. This creates vector embeddings for semantic search
+3. May take a few minutes for large catalogs
+
+### 5. Customize Widget Appearance
+
+1. Click **⚙️ Ayarlar** (Settings) button
+2. In **🎨 Görünüm** tab, customize:
+   - **Brand Colors**: Primary & secondary (gradient)
+   - **Widget Position**: bottom-right, bottom-left, top-right, top-left
+   - **Chat Title**: e.g., "Ürün Asistanı"
+   - **Welcome Message**: Greeting message
+   - **Widget Size**: small, medium, large
+   - **Language**: tr, en, etc.
+   - **Auto-open**: Enable/disable auto-open
+   - **Typing Indicator**: Show "Düşünüyorum..." message
+   - **Custom CSS**: Advanced styling
+3. Click **Kaydet**
+
+### 6. Get Embed Code (Admin Only)
+
+1. In tenant settings, switch to **📜 Embed Kodu** tab
+2. Copy the provided embed code
+3. Paste into customer website before `</body>` tag
+
+Example:
+```html
+<!-- Feattie Chat Widget -->
+<script>
+  window.FeattieChat = {
+    tenantSlug: 'my-store',
+    apiUrl: 'http://localhost:5078'
+  };
+</script>
+<script src="http://localhost:5078/widget/widget.js"></script>
+```
+
+### 7. Test Chat
+
+1. Go to **Chat Test** page
+2. Select your tenant
+3. Start chatting!
+
+---
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────────────────────────┐
+│         Customer Website                     │
+│  ┌────────────────────────────────────┐     │
+│  │  Embedded Chat Widget (JS)         │     │
+│  │  Loads tenant config via API       │     │
+│  └──────────────┬─────────────────────┘     │
+└─────────────────┼──────────────────────────┘
+                  │ HTTPS
+                  ▼
+┌──────────────────────────────────────────────┐
+│   .NET Core API (Port 5078)                  │
+│  ┌────────────────────────────────────┐     │
+│  │  Public Endpoints (No Auth):       │     │
+│  │  - /api/widget/config/{slug}       │     │
+│  │  - /api/chat/{tenantId}            │     │
+│  │                                     │     │
+│  │  Auth Endpoints:                   │     │
+│  │  - /api/tenants/{id}/settings      │     │
+│  │  - /api/tenant                     │     │
+│  └────────────────────────────────────┘     │
+└─────────────┬──────────────┬─────────────────┘
+              │              │
+              ▼              ▼
+  ┌────────────────┐  ┌──────────────────┐
+  │  PostgreSQL    │  │  Python RAG      │
+  │  Database      │  │  Service         │
+  │                │  │  (Port 8000)     │
+  │  - Tenants     │  │  - Embeddings    │
+  │  - Products    │  │  - LLM Chat      │
+  │  - Settings    │  │  - Search        │
+  │  - Sessions    │  └──────────────────┘
+  └────────────────┘
+```
+
+---
+
+## 📡 API Endpoints
+
+### Public Endpoints (No Authentication)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/widget/config/{tenantSlug}` | Get widget configuration |
+| POST | `/api/chat/{tenantId}` | Send chat message |
+| GET | `/api/chat/{tenantId}/history/{sessionId}` | Get chat history |
+| GET | `/widget/widget.js` | Widget JavaScript file |
+
+### Authenticated Endpoints
+
+#### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login |
+| POST | `/api/auth/logout` | Logout |
+| GET | `/api/auth/me` | Get current user |
+
+#### Tenant Management (Admin Only)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tenant` | List tenants |
+| POST | `/api/tenant` | Create tenant |
+| PUT | `/api/tenant/{id}` | Update tenant |
+| POST | `/api/tenant/{id}/sync-products` | Sync from Shopify |
+| POST | `/api/tenant/{id}/generate-embeddings` | Generate embeddings |
+
+#### Settings (User & Admin)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tenants/{id}/settings` | Get settings |
+| PUT | `/api/tenants/{id}/settings` | Update settings |
+| GET | `/api/tenants/{id}/settings/embed-code` | Get embed code (Admin) |
+
+---
+
+## 🗂️ Project Structure
+
+```
+feattie/
+├── authentication/SecureAuth.Api/     # .NET Core API
+│   ├── Controllers/                   # API endpoints
+│   │   ├── AuthController.cs         # Authentication
+│   │   ├── TenantController.cs       # Tenant CRUD
+│   │   ├── TenantSettingsController.cs # Settings
+│   │   └── ChatController.cs         # Chat API
+│   ├── Models/                        # Database models
+│   │   ├── User.cs
+│   │   ├── Tenant.cs
+│   │   ├── TenantSettings.cs
+│   │   ├── Product.cs
+│   │   └── ChatSession.cs
+│   ├── Services/                      # Business logic
+│   │   ├── ShopifyService.cs
+│   │   ├── PythonRAGService.cs
+│   │   └── ProductService.cs
+│   ├── Data/                          # EF Core
+│   │   └── AppDbContext.cs
+│   ├── DTOs/                          # Data Transfer Objects
+│   ├── Migrations/                    # Database migrations
+│   ├── wwwroot/widget/               # Static files
+│   │   └── widget.js                 # Embeddable widget
+│   ├── Program.cs                     # App entry point
+│   └── appsettings.json              # Configuration
+├── frontend/                          # React Admin Panel
+│   ├── src/
+│   │   ├── components/               # Reusable components
+│   │   ├── pages/                    # Pages
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── AdminDashboard.tsx
+│   │   │   ├── TenantsPage.tsx
+│   │   │   ├── TenantSettingsPage.tsx
+│   │   │   └── ChatTestPage.tsx
+│   │   └── services/
+│   │       └── api.ts                # API client
+│   └── package.json
+├── src/                               # Python RAG Service
+│   ├── api/
+│   │   └── tenant_server.py          # FastAPI server
+│   ├── embeddings/                    # Embedding providers
+│   ├── models/                        # ML models
+│   └── services/                      # LLM integrations
+├── scripts/                           # Utility scripts
+│   └── shop_pull.py                  # Shopify scraper
+├── requirements.txt                   # Python dependencies
+└── README.md                          # This file
+```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### "No module named 'uvicorn'"
+### Port Already in Use
+
+```bash
+# Kill processes
+lsof -ti:5078 | xargs kill -9  # .NET API
+lsof -ti:8000 | xargs kill -9  # Python RAG
+lsof -ti:5173 | xargs kill -9  # Frontend
+```
+
+### Database Connection Failed
+
+1. Verify PostgreSQL is running: `pg_isready`
+2. Check connection string in `appsettings.json`
+3. Ensure database `feattie` exists
+
+### Python Module Not Found
 
 ```bash
 # Make sure virtual environment is activated
-source venv/bin/activate
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+# Set PYTHONPATH
+export PYTHONPATH=$PWD    # macOS/Linux
+set PYTHONPATH=%CD%       # Windows
+
+# Reinstall dependencies
 pip install -r requirements.txt
 ```
 
-### "No module named 'sentence_transformers'"
+### Migrations Error
 
 ```bash
-pip install -r requirements-local.txt
+cd authentication/SecureAuth.Api
+
+# Reset database (WARNING: deletes all data)
+dotnet ef database drop --force
+dotnet ef database update
 ```
 
-### Embeddings taking too long
+### Chat Not Working
 
-- Use `text-embedding-3-small` (5x faster)
-- Reduce batch size in config
-- Use GPU for local embeddings
-
-### Out of memory
-
-- Reduce number of products
-- Use smaller embedding model
-- Increase server RAM
-
-### Widget not showing
-
-- Check browser console for errors
-- Verify API URL is correct
-- Check CORS settings in `config/config.yaml`
-
-### Port 8000 already in use
-
-```yaml
-# config/config.yaml
-api:
-  port: 8001
-```
+1. Check all 3 services are running (API, RAG, Frontend)
+2. Verify tenant has products synced
+3. Verify embeddings are generated
+4. Check browser console for errors
 
 ---
 
-## 🐳 Docker Deployment
+## 🔒 Security Notes
 
-```dockerfile
-# Dockerfile
-FROM python:3.11-slim
+### Production Checklist
 
-WORKDIR /app
+- [ ] Change default admin password
+- [ ] Use strong JWT secret (32+ characters)
+- [ ] Enable HTTPS
+- [ ] Store API keys in environment variables
+- [ ] Set `AllowedDomains` in tenant settings
+- [ ] Enable rate limiting
+- [ ] Regular database backups
+- [ ] Update dependencies regularly
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+### Required API Keys
 
-# Copy application
-COPY . .
+1. **OpenAI API Key**
+   - Get from: https://platform.openai.com/api-keys
+   - Used for embeddings & LLM
+   - Set in `appsettings.json` or `OPENAI_API_KEY` env var
 
-# Expose port
-EXPOSE 8000
+2. **Shopify Access Token** (per tenant)
+   - Create private app in Shopify admin
+   - Required permissions: `read_products`
 
-# Run server
-CMD ["python", "run.py"]
-```
+---
+
+## 📝 Test Users
+
+| Email | Password | Role | Access |
+|-------|----------|------|--------|
+| admin@example.com | Admin123! | Admin | Full |
+| admin@test.com | Test123! | Admin | Full |
+| john@test.com | Test123! | User | Limited |
+| jane@test.com | Test123! | User | Limited |
+
+---
+
+## 🚀 Deployment
+
+### Environment Variables
 
 ```bash
-# Build
-docker build -t shopify-rag .
+# .NET API
+ASPNETCORE_ENVIRONMENT=Production
+ConnectionStrings__Default="Host=prod-db;Database=feattie;..."
+Jwt__Secret="production-secret-key-very-secure"
+OpenAI__ApiKey="sk-..."
+Cors__AllowedOrigin="https://admin.yourdomain.com"
 
-# Run
-docker run -p 8000:8000 \
-  -e OPENAI_API_KEY=your-key \
-  -v $(pwd)/out:/app/out \
-  shopify-rag
+# Python RAG
+PYTHONPATH=/app
+OPENAI_API_KEY="sk-..."
+
+# Frontend
+VITE_API_URL=https://api.yourdomain.com
 ```
 
----
+### Production URLs
 
-## 📊 Performance
+After deployment, update embed code to use production URLs:
 
-| Metric | Value |
-|--------|-------|
-| Products indexed | 12,944 |
-| Search latency | <100ms |
-| Embedding dimension | 3072 (OpenAI large) |
-| Memory usage | ~2GB (with embeddings) |
-| Throughput | 100+ req/sec |
-
----
-
-## 🔒 Security
-
-- ✅ API keys stored in `.env` (never commit!)
-- ✅ CORS configurable per environment
-- ✅ Input validation on all endpoints
-- ⚠️ Rate limiting recommended for production
-
----
-
-## 🛠️ Development
-
-### Local Development Setup
-
-```bash
-# Development mode (with auto-reload)
-# Edit config/config.yaml:
-api:
-  reload: true
-
-python run.py
-```
-
-### Testing
-
-```bash
-# Install test dependencies
-pip install pytest httpx
-
-# Run tests
-pytest tests/
-
-# Test API manually
-python -c "
-import requests
-resp = requests.get('http://localhost:8000/')
-print(resp.json())
-"
-```
-
----
-
-## 📚 Advanced Usage
-
-### Custom Embedding Provider
-
-Implement `EmbeddingProvider` interface:
-
-```python
-from src.embeddings.base import EmbeddingProvider
-
-class MyCustomEmbeddings(EmbeddingProvider):
-    def embed_texts(self, texts, batch_size):
-        # Your implementation
-        pass
-
-    def embed_query(self, query):
-        # Your implementation
-        pass
-```
-
-### Batch Processing
-
-```python
-# Process multiple queries
-queries = ["query1", "query2", "query3"]
-for q in queries:
-    results = rag.search(q, top_k=5)
-    print(f"{q}: {len(results)} results")
+```html
+<script>
+  window.FeattieChat = {
+    tenantSlug: 'your-tenant',
+    apiUrl: 'https://api.yourdomain.com'
+  };
+</script>
+<script src="https://api.yourdomain.com/widget/widget.js"></script>
 ```
 
 ---
 
 ## 📄 License
 
-MIT License - see LICENSE file
+MIT License
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Support
 
-- Built with [FastAPI](https://fastapi.tiangolo.com/)
-- Embeddings by [OpenAI](https://openai.com/) and [Sentence-Transformers](https://www.sbert.net/)
-- Inspired by modern RAG architectures
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-org/shopify-rag/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/shopify-rag/discussions)
-- **Documentation**: This README
-- **API Docs**: http://localhost:8000/docs
+For issues and questions:
+- GitHub Issues: [Your Repo]
+- Email: [Your Email]
 
 ---
 
-**Made with ❤️ by Feattie**
-
-*Last updated: 2025*
+**Made with ❤️ for modern e-commerce**

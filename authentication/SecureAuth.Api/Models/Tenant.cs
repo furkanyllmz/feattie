@@ -33,6 +33,7 @@ public class Tenant
     public ICollection<TenantUser> TenantUsers { get; set; } = new List<TenantUser>();
     public ICollection<Product> Products { get; set; } = new List<Product>();
     public RAGConfiguration? RAGConfiguration { get; set; }
+    public TenantSettings? Settings { get; set; }
 }
 
 /// <summary>
