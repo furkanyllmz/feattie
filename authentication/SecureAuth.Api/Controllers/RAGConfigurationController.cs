@@ -14,20 +14,17 @@ public class RAGConfigurationController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly ILogger<RAGConfigurationController> _logger;
-    private readonly IConfiguration _configuration;
 
-    public RAGConfigurationController(AppDbContext context, ILogger<RAGConfigurationController> logger, IConfiguration configuration)
+    public RAGConfigurationController(AppDbContext context, ILogger<RAGConfigurationController> logger)
     {
         _context = context;
         _logger = logger;
-        _configuration = configuration;
     }
 
     /// <summary>
     /// Get RAG configuration for tenant
     /// </summary>
     [HttpGet]
-    [AllowAnonymous] // Temporary for testing
     public async Task<ActionResult<RAGConfigurationResponse>> GetConfiguration(int tenantId)
     {
         var config = await _context.RAGConfigurations
@@ -45,7 +42,6 @@ public class RAGConfigurationController : ControllerBase
     /// Create RAG configuration for tenant
     /// </summary>
     [HttpPost]
-    [AllowAnonymous] // Temporary for testing
     public async Task<ActionResult<RAGConfigurationResponse>> CreateConfiguration(
         int tenantId,
         [FromBody] CreateRAGConfigurationRequest request)
@@ -73,20 +69,16 @@ public class RAGConfigurationController : ControllerBase
             return BadRequest(new { message = "Invalid LLM provider" });
         }
 
-        // Get default OpenAI API key from environment if not provided
-        var openAIApiKey = request.OpenAIApiKey ?? _configuration["OpenAI:ApiKey"];
-        var llmApiKey = request.LLMApiKey ?? _configuration["OpenAI:ApiKey"];
-
         var config = new RAGConfiguration
         {
             TenantId = tenantId,
             EmbeddingProvider = embeddingProvider,
             EmbeddingModel = request.EmbeddingModel,
-            OpenAIApiKey = openAIApiKey,
+            OpenAIApiKey = request.OpenAIApiKey,
             OpenAIEmbeddingModel = request.OpenAIEmbeddingModel,
             LLMProvider = llmProvider,
             LLMModel = request.LLMModel,
-            LLMApiKey = llmApiKey,
+            LLMApiKey = request.LLMApiKey,
             LLMTemperature = request.LLMTemperature,
             LLMMaxTokens = request.LLMMaxTokens,
             DefaultTopK = request.DefaultTopK,
@@ -116,7 +108,6 @@ public class RAGConfigurationController : ControllerBase
     /// Update RAG configuration
     /// </summary>
     [HttpPut]
-    [AllowAnonymous] // Temporary for testing
     public async Task<ActionResult<RAGConfigurationResponse>> UpdateConfiguration(
         int tenantId,
         [FromBody] UpdateRAGConfigurationRequest request)
@@ -135,15 +126,7 @@ public class RAGConfigurationController : ControllerBase
         }
 
         if (request.EmbeddingModel != null) config.EmbeddingModel = request.EmbeddingModel;
-        if (request.OpenAIApiKey != null) 
-        {
-            config.OpenAIApiKey = request.OpenAIApiKey;
-        }
-        else if (string.IsNullOrEmpty(config.OpenAIApiKey))
-        {
-            // Use environment variable as fallback if no key is set
-            config.OpenAIApiKey = _configuration["OpenAI:ApiKey"];
-        }
+        if (request.OpenAIApiKey != null) config.OpenAIApiKey = request.OpenAIApiKey;
         if (request.OpenAIEmbeddingModel != null) config.OpenAIEmbeddingModel = request.OpenAIEmbeddingModel;
 
         if (request.LLMProvider != null && Enum.TryParse<LLMProvider>(request.LLMProvider, out var llmProvider))
@@ -152,15 +135,7 @@ public class RAGConfigurationController : ControllerBase
         }
 
         if (request.LLMModel != null) config.LLMModel = request.LLMModel;
-        if (request.LLMApiKey != null) 
-        {
-            config.LLMApiKey = request.LLMApiKey;
-        }
-        else if (string.IsNullOrEmpty(config.LLMApiKey))
-        {
-            // Use environment variable as fallback if no key is set
-            config.LLMApiKey = _configuration["OpenAI:ApiKey"];
-        }
+        if (request.LLMApiKey != null) config.LLMApiKey = request.LLMApiKey;
         if (request.LLMTemperature.HasValue) config.LLMTemperature = request.LLMTemperature.Value;
         if (request.LLMMaxTokens.HasValue) config.LLMMaxTokens = request.LLMMaxTokens.Value;
         if (request.DefaultTopK.HasValue) config.DefaultTopK = request.DefaultTopK.Value;
@@ -210,11 +185,11 @@ public class RAGConfigurationController : ControllerBase
             config.TenantId,
             config.EmbeddingProvider.ToString(),
             config.EmbeddingModel,
-            !string.IsNullOrEmpty(config.OpenAIApiKey),
+            config.OpenAIApiKey,
             config.OpenAIEmbeddingModel,
             config.LLMProvider.ToString(),
             config.LLMModel,
-            !string.IsNullOrEmpty(config.LLMApiKey),
+            config.LLMApiKey,
             config.LLMTemperature,
             config.LLMMaxTokens,
             config.DefaultTopK,

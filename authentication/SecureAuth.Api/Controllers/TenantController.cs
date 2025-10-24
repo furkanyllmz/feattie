@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using SecureAuth.Api.Data;
 using SecureAuth.Api.DTOs;
 using SecureAuth.Api.Models;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace SecureAuth.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Policy = "AdminOnly")]
+[Authorize]
 public class TenantController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -27,6 +28,7 @@ public class TenantController : ControllerBase
     /// <summary>
     /// Get all tenants (Admin only)
     /// </summary>
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TenantListItemResponse>>> GetTenants(
         [FromQuery] bool? isActive = null,
@@ -66,6 +68,7 @@ public class TenantController : ControllerBase
     {
         var tenant = await _context.Tenants
             .Include(t => t.RAGConfiguration)
+            .Include(t => t.Products)
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (tenant == null)
@@ -84,6 +87,7 @@ public class TenantController : ControllerBase
     {
         var tenant = await _context.Tenants
             .Include(t => t.RAGConfiguration)
+            .Include(t => t.Products)
             .FirstOrDefaultAsync(t => t.Slug == slug);
 
         if (tenant == null)
@@ -95,8 +99,9 @@ public class TenantController : ControllerBase
     }
 
     /// <summary>
-    /// Create new tenant
+    /// Create new tenant (Admin only)
     /// </summary>
+    [Authorize(Policy = "AdminOnly")]
     [HttpPost]
     public async Task<ActionResult<TenantResponse>> CreateTenant([FromBody] CreateTenantRequest request)
     {
@@ -156,8 +161,9 @@ public class TenantController : ControllerBase
     }
 
     /// <summary>
-    /// Update tenant
+    /// Update tenant (Admin only)
     /// </summary>
+    [Authorize(Policy = "AdminOnly")]
     [HttpPut("{id}")]
     public async Task<ActionResult<TenantResponse>> UpdateTenant(int id, [FromBody] UpdateTenantRequest request)
     {
@@ -183,8 +189,9 @@ public class TenantController : ControllerBase
     }
 
     /// <summary>
-    /// Delete tenant (soft delete - sets IsActive = false)
+    /// Delete tenant (soft delete - sets IsActive = false) (Admin only)
     /// </summary>
+    [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTenant(int id, [FromQuery] bool permanent = false)
     {
@@ -228,6 +235,7 @@ public class TenantController : ControllerBase
             .Where(tu => tu.TenantId == id)
             .Select(tu => new TenantUserResponse(
                 tu.Id,
+                tu.TenantId,
                 tu.UserId,
                 tu.User.Email,
                 tu.User.FirstName != null && tu.User.LastName != null
@@ -288,6 +296,7 @@ public class TenantController : ControllerBase
 
         return Ok(new TenantUserResponse(
             tenantUser.Id,
+            tenantUser.TenantId,
             user.Id,
             user.Email,
             user.FirstName != null && user.LastName != null ? $"{user.FirstName} {user.LastName}" : null,
@@ -299,11 +308,11 @@ public class TenantController : ControllerBase
     /// <summary>
     /// Remove user from tenant
     /// </summary>
-    [HttpDelete("{tenantId}/users/{userId}")]
-    public async Task<IActionResult> RemoveUserFromTenant(int tenantId, int userId)
+    [HttpDelete("{tenantId}/users/{tenantUserId}")]
+    public async Task<IActionResult> RemoveUserFromTenant(int tenantId, int tenantUserId)
     {
         var tenantUser = await _context.TenantUsers
-            .FirstOrDefaultAsync(tu => tu.TenantId == tenantId && tu.UserId == userId);
+            .FirstOrDefaultAsync(tu => tu.Id == tenantUserId && tu.TenantId == tenantId);
 
         if (tenantUser == null)
         {
@@ -313,7 +322,7 @@ public class TenantController : ControllerBase
         _context.TenantUsers.Remove(tenantUser);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("User {UserId} removed from tenant {TenantId}", userId, tenantId);
+        _logger.LogInformation("User {UserId} removed from tenant {TenantId}", tenantUser.UserId, tenantId);
 
         return NoContent();
     }
@@ -351,9 +360,52 @@ public class TenantController : ControllerBase
         return Ok(stats);
     }
 
+    /// <summary>
+    /// Get current user's tenants (for regular users)
+    /// </summary>
+    [HttpGet("user/tenants")]
+    public async Task<ActionResult<IEnumerable<TenantListItemResponse>>> GetUserTenants()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userIdClaim is null || !int.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new { message = "User not identified" });
+        }
+
+        var tenants = await _context.TenantUsers
+            .Where(tu => tu.UserId == userId)
+            .Include(tu => tu.Tenant)
+            .OrderByDescending(tu => tu.Tenant.CreatedAt)
+            .Select(tu => new TenantListItemResponse(
+                tu.Tenant.Id,
+                tu.Tenant.Name,
+                tu.Tenant.Slug,
+                tu.Tenant.IsActive,
+                tu.Tenant.ProductCount,
+                tu.Tenant.LastProductSync,
+                tu.Tenant.CreatedAt
+            ))
+            .ToListAsync();
+
+        return Ok(tenants);
+    }
+
     // Helper methods
     private static TenantResponse MapToTenantResponse(Tenant tenant)
     {
+        var totalProducts = tenant.ProductCount;
+        var embeddingsCount = tenant.Products?.Count(p => p.HasEmbedding) ?? 0;
+        
+        string embeddingsStatus = "idle";
+        if (embeddingsCount == totalProducts && totalProducts > 0)
+        {
+            embeddingsStatus = "completed";
+        }
+        else if (embeddingsCount > 0)
+        {
+            embeddingsStatus = "partial";
+        }
+
         return new TenantResponse(
             tenant.Id,
             tenant.Name,
@@ -366,7 +418,9 @@ public class TenantController : ControllerBase
             tenant.LastProductSync,
             tenant.CreatedAt,
             tenant.UpdatedAt,
-            tenant.RAGConfiguration != null
+            tenant.RAGConfiguration != null,
+            embeddingsCount,
+            embeddingsStatus
         );
     }
 }

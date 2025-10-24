@@ -27,3 +27,4 @@ echo "2. Start the .NET API: cd feattie/authentication/SecureAuth.Api && dotnet 
 echo ""
 echo "📝 Test the setup:"
 echo "curl -X GET http://localhost:5078/api/tenants/1/settings"
+

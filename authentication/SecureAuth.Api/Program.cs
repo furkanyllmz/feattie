@@ -66,7 +66,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(o =>
 {
-    o.AddPolicy("AdminOnly", p => p.RequireRole(nameof(Role.ADMIN)));
+    // Role claims are stored as integers: 0=USER, 1=ADMIN
+    o.AddPolicy("AdminOnly", p => p.RequireRole("1")); // ADMIN role value
 });
 
 // Swagger/OpenAPI

@@ -33,7 +33,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         db.Users.Add(user);
         await db.SaveChangesAsync();
 
-        return Created("", new { user.Id, user.Email, user.Role, user.CreatedAt });
+        return Created("", new { user.Id, user.Email, role = (int)user.Role, user.CreatedAt });
     }
 
     [HttpPost("login")]
@@ -76,7 +76,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         var token = CreateJwt(user, cfg);
         SetJwtCookie(token, cfg);
 
-        return Ok(new { user = new { user.Id, user.Email, user.Role, user.FirstName, user.LastName } });
+        return Ok(new { user = new { user.Id, user.Email, role = (int)user.Role, user.FirstName, user.LastName } });
     }
 
     [Authorize]
@@ -89,15 +89,135 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
 
         var me = await db.Users
             .Where(u => u.Id == uid)
-            .Select(u => new { u.Id, u.Email, u.Role, u.CreatedAt })
+            .Select(u => new { u.Id, u.Email, role = (int)u.Role, u.CreatedAt })
             .FirstAsync();
 
         return Ok(me);
     }
 
+    [Authorize]
+    [HttpGet("me/tenants")]
+    public async Task<IActionResult> MyTenants()
+    {
+        var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (idClaim is null || !int.TryParse(idClaim, out var uid))
+            return Unauthorized();
+
+        var tenants = await db.TenantUsers
+            .Where(tu => tu.UserId == uid)
+            .Include(tu => tu.Tenant)
+            .Select(tu => new
+            {
+                tu.Tenant.Id,
+                tu.Tenant.Name,
+                tu.Tenant.Slug,
+                tu.Tenant.IsActive,
+                tu.Tenant.ProductCount,
+                tu.Tenant.LastProductSync,
+                tu.Tenant.CreatedAt,
+                role = tu.Role.ToString(),
+                roleNumber = (int)tu.Role,
+                joinedAt = tu.JoinedAt
+            })
+            .ToListAsync();
+
+        return Ok(tenants);
+    }
+
     [Authorize(Policy = "AdminOnly")]
     [HttpGet("admin/secret")]
     public IActionResult AdminSecret() => Ok(new { secret = "admin-only 🎩" });
+
+    /// <summary>
+    /// Assign user to tenant
+    /// </summary>
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPost("admin/users/{userId}/tenants/{tenantId}")]
+    public async Task<IActionResult> AssignUserToTenant(int userId, int tenantId, [FromBody] AssignTenantRequest? request)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user == null)
+            return NotFound(new { message = "User not found" });
+
+        var tenant = await db.Tenants.FindAsync(tenantId);
+        if (tenant == null)
+            return NotFound(new { message = "Tenant not found" });
+
+        // Check if already assigned
+        var existing = await db.TenantUsers
+            .FirstOrDefaultAsync(tu => tu.UserId == userId && tu.TenantId == tenantId);
+
+        if (existing != null)
+            return BadRequest(new { message = "User is already assigned to this tenant" });
+
+        var tenantUser = new TenantUser
+        {
+            UserId = userId,
+            TenantId = tenantId,
+            Role = (TenantRole)(request?.Role ?? 0),
+            JoinedAt = DateTime.UtcNow
+        };
+
+        db.TenantUsers.Add(tenantUser);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            id = tenantUser.Id,
+            userId = tenantUser.UserId,
+            tenantId = tenantUser.TenantId,
+            role = tenantUser.Role.ToString(),
+            joinedAt = tenantUser.JoinedAt
+        });
+    }
+
+    /// <summary>
+    /// Remove user from tenant
+    /// </summary>
+    [Authorize(Policy = "AdminOnly")]
+    [HttpDelete("admin/users/{userId}/tenants/{tenantId}")]
+    public async Task<IActionResult> RemoveUserFromTenant(int userId, int tenantId)
+    {
+        var tenantUser = await db.TenantUsers
+            .FirstOrDefaultAsync(tu => tu.UserId == userId && tu.TenantId == tenantId);
+
+        if (tenantUser == null)
+            return NotFound(new { message = "User is not assigned to this tenant" });
+
+        db.TenantUsers.Remove(tenantUser);
+        await db.SaveChangesAsync();
+
+        return Ok(new { message = "User removed from tenant successfully" });
+    }
+
+    /// <summary>
+    /// Get user's tenant assignments
+    /// </summary>
+    [Authorize(Policy = "AdminOnly")]
+    [HttpGet("admin/users/{userId}/tenants")]
+    public async Task<IActionResult> GetUserTenants(int userId)
+    {
+        var user = await db.Users.FindAsync(userId);
+        if (user == null)
+            return NotFound(new { message = "User not found" });
+
+        var tenants = await db.TenantUsers
+            .Where(tu => tu.UserId == userId)
+            .Include(tu => tu.Tenant)
+            .Select(tu => new
+            {
+                tu.Tenant.Id,
+                tu.Tenant.Name,
+                tu.Tenant.Slug,
+                tu.Tenant.IsActive,
+                role = tu.Role.ToString(),
+                roleNumber = (int)tu.Role,
+                joinedAt = tu.JoinedAt
+            })
+            .ToListAsync();
+
+        return Ok(tenants);
+    }
 
     [Authorize]
     [HttpPost("logout")]
@@ -220,7 +340,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
             user.Email, 
             user.FirstName, 
             user.LastName, 
-            user.Role,
+            role = (int)user.Role,
             user.EmailVerified,
             user.CreatedAt 
         });
@@ -242,7 +362,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
 
         return Ok(new { 
             message = $"User role updated to {(Role)dto.Role}",
-            user = new { user.Id, user.Email, user.Role }
+            user = new { user.Id, user.Email, role = (int)user.Role }
         });
     }
 
@@ -384,7 +504,7 @@ public class AuthController(AppDbContext db, IConfiguration cfg) : ControllerBas
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
+            new Claim(ClaimTypes.Role, ((int)user.Role).ToString())
         };
 
         var token = new JwtSecurityToken(

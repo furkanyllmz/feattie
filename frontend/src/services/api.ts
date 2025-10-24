@@ -33,6 +33,11 @@ class ApiService {
     return response.data;
   }
 
+  async register(email: string, password: string) {
+    const response = await this.api.post('/api/auth/register', { email, password });
+    return response.data;
+  }
+
   async logout() {
     const response = await this.api.post('/api/auth/logout');
     return response.data;
@@ -40,6 +45,27 @@ class ApiService {
 
   async getCurrentUser() {
     const response = await this.api.get('/api/auth/me');
+    // Wrap in { user: ... } for consistency with login response
+    return { user: response.data };
+  }
+
+  async getUsers(params?: { search?: string; page?: number; pageSize?: number }) {
+    const response = await this.api.get('/api/auth/admin/users', { params });
+    return response.data;
+  }
+
+  async updateUserRole(userId: number, role: number) {
+    const response = await this.api.put(`/api/auth/admin/users/${userId}/role`, { role });
+    return response.data;
+  }
+
+  async banUser(userId: number, data: { reason: string; durationDays: number }) {
+    const response = await this.api.post(`/api/auth/admin/users/${userId}/ban`, data);
+    return response.data;
+  }
+
+  async unbanUser(userId: number) {
+    const response = await this.api.post(`/api/auth/admin/users/${userId}/unban`);
     return response.data;
   }
 
@@ -173,6 +199,36 @@ class ApiService {
 
   async getEmbedCode(tenantId: number) {
     const response = await this.api.get(`/api/tenants/${tenantId}/settings/embed-code`);
+    return response.data;
+  }
+
+  // === TENANT USERS ===
+  async getTenantUsers(tenantId: number) {
+    const response = await this.api.get(`/api/tenant/${tenantId}/users`);
+    return response.data;
+  }
+
+  async addUserToTenant(tenantId: number, userId: number, role: string = 'VIEWER') {
+    const response = await this.api.post(`/api/tenant/${tenantId}/users`, {
+      userId,
+      role,
+    });
+    return response.data;
+  }
+
+  async removeUserFromTenant(tenantId: number, tenantUserId: number) {
+    const response = await this.api.delete(`/api/tenant/${tenantId}/users/${tenantUserId}`);
+    return response.data;
+  }
+
+  async updateTenantUserRole(tenantId: number, tenantUserId: number, role: string) {
+    const response = await this.api.put(`/api/tenant/${tenantId}/users/${tenantUserId}`, { role });
+    return response.data;
+  }
+
+  // Get tenant where user has access
+  async getUserTenants() {
+    const response = await this.api.get('/api/tenant/user/tenants');
     return response.data;
   }
 }

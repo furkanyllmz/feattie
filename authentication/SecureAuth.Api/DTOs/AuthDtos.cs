@@ -15,3 +15,4 @@ public record UpdateProfileDto(string? Email, string? FirstName, string? LastNam
 public record UpdateUserRoleDto(int Role); // 0=USER, 1=ADMIN
 public record BanUserDto(string Reason, int DurationDays);
 public record GetUsersFilterDto(string? Search, int? Role, bool? IsActive, int Page = 1, int PageSize = 10);
+public record AssignTenantRequest(int Role = 0); // 0=VIEWER, 1=EDITOR, 2=ADMIN

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feattie Chat Widget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .status {
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Feattie Chat Widget Test</h1>
+        
+        <div class="info">
+            <h3>Test Bilgileri</h3>
+            <p><strong>Tenant:</strong> Liva Pastaneleri</p>
+            <p><strong>Tenant Slug:</strong> liva-pastaneleri</p>
+            <p><strong>API URL:</strong> http://localhost:5078</p>
+        </div>
+
+        <div class="status">
+            <p><strong>Widget Durumu:</strong> <span id="widget-status">Yükleniyor...</span></p>
+            <p><strong>API Bağlantısı:</strong> <span id="api-status">Kontrol ediliyor...</span></p>
+        </div>
+
+        <h2>Demo İçerik</h2>
+        <p>
+            Liva Pastaneleri'ne hoş geldiniz! Bu sayfada chat widget'ı test ediyoruz.
+            Sağ alt köşede chat butonunu göreceksiniz.
+        </p>
+        <p>
+            Widget açıldığında Liva Pastaneleri ürünleri hakkında sorular sorabilirsiniz.
+        </p>
+        
+        <h3>Örnek Sorular:</h3>
+        <ul>
+            <li>Hangi pastalar var?</li>
+            <li>En popüler ürünleriniz neler?</li>
+            <li>Fiyat aralığı nedir?</li>
+            <li>Teslimat yapıyor musunuz?</li>
+        </ul>
+    </div>
+
+    <!-- Feattie Chat Widget -->
+    <script>
+      window.FeattieChat = {
+        tenantSlug: 'liva-pastaneleri',
+        apiUrl: 'http://localhost:5078'
+      };
+
+      // Widget yükleme durumunu kontrol et
+      setTimeout(() => {
+        const statusEl = document.getElementById('widget-status');
+        if (window.FeattieChat && typeof window.FeattieChat.init === 'function') {
+          statusEl.textContent = '✅ Widget yüklendi';
+          statusEl.style.color = 'green';
+        } else {
+          statusEl.textContent = '❌ Widget yüklenemedi';
+          statusEl.style.color = 'red';
+        }
+      }, 2000);
+
+      // API bağlantısını kontrol et
+      fetch('http://localhost:5078/api/tenant')
+        .then(res => res.json())
+        .then(data => {
+          const apiStatusEl = document.getElementById('api-status');
+          apiStatusEl.textContent = '✅ API bağlantısı başarılı';
+          apiStatusEl.style.color = 'green';
+        })
+        .catch(err => {
+          const apiStatusEl = document.getElementById('api-status');
+          apiStatusEl.textContent = '❌ API bağlantısı başarısız: ' + err.message;
+          apiStatusEl.style.color = 'red';
+        });
+    </script>
+    <script src="http://localhost:5078/widget/widget.js"></script>
+</body>
+</html>

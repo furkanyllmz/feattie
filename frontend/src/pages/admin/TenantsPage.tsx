@@ -245,7 +245,19 @@ export default function TenantsPage() {
 
   const loadTenants = async () => {
     try {
-      const data = await api.getTenants();
+      let data;
+      if (isAdmin) {
+        // Admin tüm tenantları görebilir
+        data = await api.getTenants();
+      } else {
+        // Regular user sadece assign edilen tenantları görebilir
+        try {
+          data = await api.getUserTenants();
+        } catch (err) {
+          console.error('Error loading user tenants, falling back to getTenants', err);
+          data = [];
+        }
+      }
       setTenants(data);
 
       // Load stats for each tenant
@@ -355,7 +367,9 @@ export default function TenantsPage() {
   return (
     <Container>
       <Header>
-        <h1 style={{ margin: 0 }}>Tenant Yönetimi</h1>
+        <h1 style={{ margin: 0 }}>
+          {isAdmin ? 'Tenant Yönetimi' : 'Tenant Ayarları'}
+        </h1>
         {isAdmin && (
           <Button onClick={() => setShowModal(true)}>+ Yeni Tenant</Button>
         )}

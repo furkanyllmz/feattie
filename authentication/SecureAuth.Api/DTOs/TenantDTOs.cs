@@ -30,7 +30,9 @@ public record TenantResponse(
     DateTime? LastProductSync,
     DateTime CreatedAt,
     DateTime UpdatedAt,
-    bool HasRAGConfiguration
+    bool HasRAGConfiguration,
+    int EmbeddingsGeneratedCount,
+    string EmbeddingsStatus // "idle", "partial", "completed"
 );
 
 public record TenantListItemResponse(
@@ -52,6 +54,7 @@ public record AddUserToTenantRequest(
 
 public record TenantUserResponse(
     int Id,
+    int TenantId,
     int UserId,
     string UserEmail,
     string? UserName,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import api from '../../services/api';
 
@@ -43,12 +44,20 @@ const Section = styled.div`
 `;
 
 export default function DashboardHome() {
+  const { user } = useOutletContext<{ user: any }>();
+  const navigate = useNavigate();
   const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isAdmin = user?.user?.role === 1;
+
   useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin/tenants');
+      return;
+    }
     loadData();
-  }, []);
+  }, [isAdmin, navigate]);
 
   const loadData = async () => {
     try {
