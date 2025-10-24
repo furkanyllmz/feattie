@@ -8,7 +8,7 @@
 
 | Component | Technology | Port | Status |
 |-----------|------------|------|--------|
-| **Admin Dashboard** | React + Vite + TypeScript + Tailwind + shadcn/ui | 5173 | ✅ |
+| **Admin Dashboard** | React + Vite + TypeScript + Tailwind + shadcn/ui | 3000 | ✅ |
 | **Backend API** | ASP.NET Core 9.0 + Entity Framework Core | 5078 | ✅ |
 | **RAG Service** | Python 3.11 + FastAPI + Sentence Transformers | 8000 | ✅ |
 | **Database** | PostgreSQL 15+ | 5432 | ✅ |
@@ -97,11 +97,11 @@ echo "VITE_API_URL=http://localhost:5078" > .env
 npm run dev
 ```
 
-✅ **Admin Dashboard running at:** http://localhost:5173
+✅ **Admin Dashboard running at:** http://localhost:3000
 
 ### 5️⃣ Login & Create Your First Tenant
 
-1. Open browser: **http://localhost:5173/auth/login**
+1. Open browser: **http://localhost:3000/auth/login**
 2. Login with admin credentials (see above)
 3. Navigate to **"Tenant Management"**
 4. Click **"Create New Tenant"** button
@@ -393,7 +393,7 @@ OPENAI_API_KEY=sk-your-openai-api-key-here
 └──────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│         Admin Dashboard (React + Vite - Port 5173)          │
+│         Admin Dashboard (React + Vite - Port 3000)          │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  Pages:                                              │  │
 │  │  - Dashboard (system stats)                          │  │
