@@ -101,7 +101,7 @@ export default function ChatPage() {
         type: "bot",
         content: response.data.response,
         timestamp: new Date(),
-        products: response.data.products,
+        products: response.data.productsReferenced,
       }
 
       setMessages((prev) => [...prev, botMessage])

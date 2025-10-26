@@ -157,11 +157,13 @@ public class ChatController : ControllerBase
                     Id = p.Id,
                     Title = p.Title,
                     Price = p.Price,
-                    ImageUrl = p.ImageUrl
+                    ImageUrl = p.ImageUrl,
+                    Handle = p.Handle
                 }).ToList(),
                 ContextsUsed = contexts.Select(c => c.Title).ToList(),
                 MessageCount = session.MessageCount,
-                ElapsedMs = stopwatch.ElapsedMilliseconds
+                ElapsedMs = stopwatch.ElapsedMilliseconds,
+                ShopifyStoreUrl = tenant.ShopifyStoreUrl
             });
         }
         catch (Exception ex)
@@ -423,6 +425,7 @@ public class ChatResponse
     public List<string> ContextsUsed { get; set; } = new();
     public int MessageCount { get; set; }
     public long ElapsedMs { get; set; }
+    public string? ShopifyStoreUrl { get; set; }
 }
 
 public class ProductReference
@@ -431,4 +434,5 @@ public class ProductReference
     public string Title { get; set; } = default!;
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
+    public string? Handle { get; set; }
 }

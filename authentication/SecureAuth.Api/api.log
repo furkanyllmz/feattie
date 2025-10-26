@@ -1,0 +1,163 @@
+C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Properties\launchSettings.json içindeki başlatma ayarları kullanılıyor...
+Derleniyor...
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (69ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (19ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+          "MigrationId" character varying(150) NOT NULL,
+          "ProductVersion" character varying(32) NOT NULL,
+          CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+      );
+info: Microsoft.EntityFrameworkCore.Migrations[20411]
+      Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      LOCK TABLE "__EFMigrationsHistory" IN ACCESS EXCLUSIVE MODE
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Users" AS u
+          WHERE u."Role" = 1)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."BanExpires", u."BanReason", u."BannedAt", u."CreatedAt", u."Email", u."EmailVerificationExpires", u."EmailVerificationToken", u."EmailVerified", u."FirstName", u."IsActive", u."IsBanned", u."LastLoginAt", u."LastName", u."PasswordHash", u."PasswordResetExpires", u."PasswordResetToken", u."Role"
+      FROM "Users" AS u
+      WHERE u."Email" = 'aleyna@admin.com'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Users" AS u
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Tenants" AS t)
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5078
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (50ms) [Parameters=[@__uid_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."Email", u."Role"::int AS role, u."CreatedAt"
+      FROM "Users" AS u
+      WHERE u."Id" = @__uid_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (28ms) [Parameters=[@__uid_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."Email", u."Role"::int AS role, u."CreatedAt"
+      FROM "Users" AS u
+      WHERE u."Id" = @__uid_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@__p_1='?' (DbType = Int32), @__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."Name", t."Slug", t."IsActive", t."ProductCount", t."LastProductSync", t."CreatedAt"
+      FROM "Tenants" AS t
+      ORDER BY t."CreatedAt" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__p_1='?' (DbType = Int32), @__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."Name", t."Slug", t."IsActive", t."ProductCount", t."LastProductSync", t."CreatedAt"
+      FROM "Tenants" AS t
+      ORDER BY t."CreatedAt" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+info: SecureAuth.Api.Controllers.ProductController[0]
+      Starting product sync for tenant 2
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."CreatedAt", t."IsActive", t."LastProductSync", t."MaxProducts", t."Name", t."ProductCount", t."ShopifyAccessToken", t."ShopifyStoreUrl", t."Slug", t."SubscriptionExpires", t."UpdatedAt"
+      FROM "Tenants" AS t
+      WHERE t."Id" = @__p_0
+      LIMIT 1
+info: SecureAuth.Api.Services.ProductService[0]
+      Starting product sync for tenant 2 (snow-devil)
+info: SecureAuth.Api.Services.ShopifyService[0]
+      Fetching products from Shopify using shop_pull.py: https://snow-devil.myshopify.com
+info: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py output: 
+warn: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py stderr: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+fail: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py failed with exit code 2
+fail: SecureAuth.Api.Services.ShopifyService[0]
+      Error fetching products with shop_pull.py
+      System.Exception: Failed to fetch products: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+         at SecureAuth.Api.Services.ShopifyService.FetchProductsAsync(String shopifyStoreUrl, String accessToken) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ShopifyService.cs:line 69
+fail: SecureAuth.Api.Services.ProductService[0]
+      Product sync failed for tenant 2
+      System.Exception: Failed to fetch products: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+         at SecureAuth.Api.Services.ShopifyService.FetchProductsAsync(String shopifyStoreUrl, String accessToken) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ShopifyService.cs:line 69
+         at SecureAuth.Api.Services.ProductService.SyncProductsAsync(Int32 tenantId, Boolean forceResync) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ProductService.cs:line 44
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__uid_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."Email", u."Role"::int AS role, u."CreatedAt"
+      FROM "Users" AS u
+      WHERE u."Id" = @__uid_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__uid_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."Email", u."Role"::int AS role, u."CreatedAt"
+      FROM "Users" AS u
+      WHERE u."Id" = @__uid_0
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__p_1='?' (DbType = Int32), @__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."Name", t."Slug", t."IsActive", t."ProductCount", t."LastProductSync", t."CreatedAt"
+      FROM "Tenants" AS t
+      ORDER BY t."CreatedAt" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__p_1='?' (DbType = Int32), @__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."Name", t."Slug", t."IsActive", t."ProductCount", t."LastProductSync", t."CreatedAt"
+      FROM "Tenants" AS t
+      ORDER BY t."CreatedAt" DESC
+      LIMIT @__p_1 OFFSET @__p_0
+info: SecureAuth.Api.Controllers.ProductController[0]
+      Starting product sync for tenant 2
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT t."Id", t."CreatedAt", t."IsActive", t."LastProductSync", t."MaxProducts", t."Name", t."ProductCount", t."ShopifyAccessToken", t."ShopifyStoreUrl", t."Slug", t."SubscriptionExpires", t."UpdatedAt"
+      FROM "Tenants" AS t
+      WHERE t."Id" = @__p_0
+      LIMIT 1
+info: SecureAuth.Api.Services.ProductService[0]
+      Starting product sync for tenant 2 (snow-devil)
+info: SecureAuth.Api.Services.ShopifyService[0]
+      Fetching products from Shopify using shop_pull.py: https://snow-devil.myshopify.com
+info: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py output: 
+warn: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py stderr: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+fail: SecureAuth.Api.Services.ShopifyService[0]
+      shop_pull.py failed with exit code 2
+fail: SecureAuth.Api.Services.ShopifyService[0]
+      Error fetching products with shop_pull.py
+      System.Exception: Failed to fetch products: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+         at SecureAuth.Api.Services.ShopifyService.FetchProductsAsync(String shopifyStoreUrl, String accessToken) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ShopifyService.cs:line 69
+fail: SecureAuth.Api.Services.ProductService[0]
+      Product sync failed for tenant 2
+      System.Exception: Failed to fetch products: python3: can't open file 'C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\shop_pull.py': [Errno 2] No such file or directory
+      
+         at SecureAuth.Api.Services.ShopifyService.FetchProductsAsync(String shopifyStoreUrl, String accessToken) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ShopifyService.cs:line 69
+         at SecureAuth.Api.Services.ProductService.SyncProductsAsync(Int32 tenantId, Boolean forceResync) in C:\Users\90552\OneDrive\Belgeler\GitHub\feattie\authentication\SecureAuth.Api\Services\ProductService.cs:line 44

@@ -110,6 +110,19 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Admin hazır: admin@example.com / Admin123!");
     }
 
+    // Update aleyna@admin.com to Admin role if exists
+    var aleyna = db.Users.FirstOrDefault(u => u.Email == "aleyna@admin.com");
+    if (aleyna != null && aleyna.Role != Role.ADMIN)
+    {
+        aleyna.Role = Role.ADMIN;
+        aleyna.FirstName = "Aleyna";
+        aleyna.LastName = "Admin";
+        aleyna.IsActive = true;
+        aleyna.EmailVerified = true;
+        db.SaveChanges();
+        Console.WriteLine("✅ aleyna@admin.com Admin olarak güncellendi!");
+    }
+
     // Test verilerini oluştur
     if (db.Users.Count() < 5)
     {
@@ -136,6 +149,17 @@ using (var scope = app.Services.CreateScope())
                 IsActive = true,
                 EmailVerified = true,
                 CreatedAt = DateTime.UtcNow.AddDays(-25)
+            },
+            new User 
+            { 
+                Email = "aleyna@admin.com", 
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"), 
+                Role = Role.ADMIN,
+                FirstName = "Aleyna",
+                LastName = "Admin",
+                IsActive = true,
+                EmailVerified = true,
+                CreatedAt = DateTime.UtcNow
             },
             new User 
             { 
@@ -255,22 +279,52 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("🔑 Tüm şifreler: Test123!");
     }
 
-    // Create default tenant for testing
+    // Create default tenants for testing
     if (!db.Tenants.Any())
     {
-        var defaultTenant = new Tenant
+        var tenants = new List<Tenant>
         {
-            Name = "Test Mağaza",
-            Slug = "test-magaza",
-            ShopifyStoreUrl = "https://test-shop.myshopify.com",
+            new Tenant
+            {
+                Name = "Test Mağaza",
+                Slug = "test-magaza",
+                ShopifyStoreUrl = "https://test-shop.myshopify.com",
+                IsActive = true,
+                MaxProducts = 1000,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Tenant
+            {
+                Name = "Snow Devil",
+                Slug = "snow-devil1",
+                ShopifyStoreUrl = "https://snow-devil.myshopify.com",
+                IsActive = true,
+                MaxProducts = 1000,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+        db.Tenants.AddRange(tenants);
+        await db.SaveChangesAsync();
+        Console.WriteLine("🏪 Default tenants created: test-magaza, snow-devil1");
+    }
+    else if (!db.Tenants.Any(t => t.Slug == "snow-devil1"))
+    {
+        // Add Snow Devil if doesn't exist
+        var snowDevil = new Tenant
+        {
+            Name = "Snow Devil",
+            Slug = "snow-devil1",
+            ShopifyStoreUrl = "https://snow-devil.myshopify.com",
             IsActive = true,
             MaxProducts = 1000,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        db.Tenants.Add(defaultTenant);
+        db.Tenants.Add(snowDevil);
         await db.SaveChangesAsync();
-        Console.WriteLine("🏪 Default tenant created: test-magaza");
+        Console.WriteLine("🏪 Snow Devil tenant created");
     }
 }
 

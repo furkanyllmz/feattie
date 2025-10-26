@@ -20,15 +20,29 @@ public class ShopifyService : IShopifyService
 
         try
         {
-            // Get project root dynamically (goes up 3 levels from bin/Debug/net9.0)
+            // Get project root dynamically
             var currentDir = Directory.GetCurrentDirectory();
-            var projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", ".."));
+            string projectRoot;
 
-            // If running from authentication/SecureAuth.Api, go up one more level
-            if (currentDir.Contains("SecureAuth.Api"))
+            // Check if we're in bin/Debug/net9.0 (runtime) or SecureAuth.Api (development)
+            if (currentDir.Contains("bin"))
             {
-                projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", "..", ".."));
+                // Running from bin/Debug/net9.0 - go up to feattie root
+                projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", "..", "..", "..", ".."));
             }
+            else if (currentDir.Contains("SecureAuth.Api"))
+            {
+                // Running from authentication/SecureAuth.Api - go up to feattie root
+                projectRoot = Path.GetFullPath(Path.Combine(currentDir, "..", ".."));
+            }
+            else
+            {
+                // Fallback: assume we're already at feattie root
+                projectRoot = currentDir;
+            }
+
+            _logger.LogInformation("Current directory: {CurrentDir}", currentDir);
+            _logger.LogInformation("Project root: {ProjectRoot}", projectRoot);
 
             var tempDir = Path.Combine(projectRoot, "temp_sync");
             if (Directory.Exists(tempDir))
@@ -38,11 +52,13 @@ public class ShopifyService : IShopifyService
             Directory.CreateDirectory(tempDir);
 
             // Use the existing shop_pull.py script
+            // Use python3 on Linux/Mac, python on Windows
+            var pythonCommand = OperatingSystem.IsWindows() ? "python" : "python3";
             var process = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "python3",
+                    FileName = pythonCommand,
                     Arguments = $"shop_pull.py --base-url {shopifyStoreUrl} --outdir ./temp_sync --max-pages 5 --per-page 250",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -99,13 +115,30 @@ public class ShopifyService : IShopifyService
                 productGroups[productId].Add(ragProduct);
             }
 
-            // Now fetch images from Shopify API
-            var productsWithImages = await FetchProductImagesAsync(shopifyStoreUrl, productGroups.Keys.ToList());
-
             // Convert to ShopifyProduct objects
             foreach (var (productId, variants) in productGroups)
             {
                 var firstVariant = variants.First();
+
+                // Get images from JSONL data (no need to call Shopify API)
+                var images = new List<ShopifyImage>();
+                var uniqueImageUrls = new HashSet<string>();
+
+                foreach (var variantData in variants)
+                {
+                    if (variantData.TryGetValue("image_url", out var imgUrl) && imgUrl.ValueKind == JsonValueKind.String)
+                    {
+                        var imageUrl = imgUrl.GetString();
+                        if (!string.IsNullOrEmpty(imageUrl) && uniqueImageUrls.Add(imageUrl))
+                        {
+                            images.Add(new ShopifyImage
+                            {
+                                Id = 0, // Not needed since we have the URL
+                                Src = imageUrl
+                            });
+                        }
+                    }
+                }
 
                 var product = new ShopifyProduct
                 {
@@ -118,9 +151,7 @@ public class ShopifyService : IShopifyService
                         ? tags.EnumerateArray().Select(t => t.GetString() ?? "").ToArray()
                         : Array.Empty<string>(),
                     Variants = new List<ShopifyVariant>(),
-                    Images = productsWithImages.ContainsKey(productId)
-                        ? productsWithImages[productId]
-                        : new List<ShopifyImage>()
+                    Images = images
                 };
 
                 // Add all variants

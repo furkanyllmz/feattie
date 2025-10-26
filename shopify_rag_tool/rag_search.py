@@ -21,7 +21,7 @@ class ProductRAG:
                        Other options: paraphrase-multilingual-MiniLM-L12-v2 (for Turkish)
         """
         print(f"[INFO] Loading embedding model: {model_name}")
-        self.model = SentenceTransformer(model_name)x"
+        self.model = SentenceTransformer(model_name)
         self.products: List[Dict[str, Any]] = []
         self.embeddings: List[np.ndarray] = []
         self.jsonl_path = jsonl_path

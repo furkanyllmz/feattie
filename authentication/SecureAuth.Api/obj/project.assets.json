@@ -3642,24 +3642,32 @@
     ]
   },
   "packageFolders": {
-    "/Users/furkanyilmaz/.nuget/packages/": {}
+    "C:\\Users\\90552\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
+      "projectUniqueName": "C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\feattie\\authentication\\SecureAuth.Api\\SecureAuth.Api.csproj",
       "projectName": "SecureAuth.Api",
-      "projectPath": "/Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/SecureAuth.Api.csproj",
-      "packagesPath": "/Users/furkanyilmaz/.nuget/packages/",
-      "outputPath": "/Users/furkanyilmaz/Desktop/feattie/authentication/SecureAuth.Api/obj/",
+      "projectPath": "C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\feattie\\authentication\\SecureAuth.Api\\SecureAuth.Api.csproj",
+      "packagesPath": "C:\\Users\\90552\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\90552\\OneDrive\\Belgeler\\GitHub\\feattie\\authentication\\SecureAuth.Api\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/furkanyilmaz/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\90552\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3744,7 +3752,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

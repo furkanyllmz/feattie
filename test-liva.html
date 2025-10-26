@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feattie Chat Widget Test</title>
+    <title>Liva Pastaneleri Chat Widget Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,12 +42,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎨 Feattie Chat Widget Test</h1>
-        
+        <h1>🍰 Liva Pastaneleri Chat Widget Test</h1>
+
         <div class="info">
             <h3>Test Bilgileri</h3>
             <p><strong>Tenant:</strong> Liva Pastaneleri</p>
-            <p><strong>Tenant Slug:</strong> liva-pastaneleri</p>
+            <p><strong>Tenant Slug:</strong> liva</p>
             <p><strong>API URL:</strong> http://localhost:5078</p>
         </div>
 
@@ -64,7 +64,7 @@
         <p>
             Widget açıldığında Liva Pastaneleri ürünleri hakkında sorular sorabilirsiniz.
         </p>
-        
+
         <h3>Örnek Sorular:</h3>
         <ul>
             <li>Hangi pastalar var?</li>
@@ -78,7 +78,9 @@
     <script>
       window.FeattieChat = {
         tenantSlug: 'liva',
-        apiUrl: 'http://localhost:5078'
+        apiUrl: 'http://localhost:5078',
+        primaryColor: '#667eea',
+        position: 'bottom-right'
       };
 
       // Widget yükleme durumunu kontrol et

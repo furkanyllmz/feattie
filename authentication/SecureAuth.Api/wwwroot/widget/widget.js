@@ -408,11 +408,22 @@
 
     if (productData) {
       messageDiv.className = 'feattie-message product-card';
+      // Build product URL from shopify store URL + handle
+      const productUrl = productData.shopifyStoreUrl && productData.handle
+        ? `${productData.shopifyStoreUrl.replace(/\/$/, '')}/products/${productData.handle}`
+        : productData.handle || '#';
+
+      console.log('Building product URL:', {
+        shopifyStoreUrl: productData.shopifyStoreUrl,
+        handle: productData.handle,
+        finalUrl: productUrl
+      });
+
       messageDiv.innerHTML = `
         ${productData.imageUrl ? `<img src="${productData.imageUrl}" class="feattie-product-image" alt="${productData.title}">` : ''}
         <div class="feattie-product-title">${productData.title}</div>
         <div class="feattie-product-price">${productData.price} TL</div>
-        ${productData.handle ? `<a href="${productData.handle}" target="_blank" style="color: ${widgetConfig.brandColorPrimary}; font-size: 13px; text-decoration: none;">Ürünü Görüntüle →</a>` : ''}
+        ${productData.handle ? `<a href="${productUrl}" target="_blank" style="color: ${widgetConfig.brandColorPrimary}; font-size: 13px; text-decoration: none;">Ürünü Görüntüle →</a>` : ''}
       `;
     } else {
       messageDiv.className = `feattie-message ${type}`;
@@ -461,6 +472,9 @@
 
       const data = await response.json();
 
+      // Debug: Log entire response
+      console.log('API Response:', data);
+
       // Update session ID if provided
       if (data.sessionId) {
         sessionId = data.sessionId;
@@ -474,12 +488,16 @@
 
       // Add product cards if any (productsReferenced from ChatResponse)
       if (data.productsReferenced && data.productsReferenced.length > 0) {
+        console.log('Shopify Store URL:', data.shopifyStoreUrl);
+        console.log('Full data object keys:', Object.keys(data));
         data.productsReferenced.forEach(product => {
+          console.log('Product:', product);
           addMessage('', 'assistant', {
             title: product.title,
             price: product.price,
             imageUrl: product.imageUrl,
-            handle: product.handle || `#product-${product.id}`
+            handle: product.handle,
+            shopifyStoreUrl: data.shopifyStoreUrl
           });
         });
       }

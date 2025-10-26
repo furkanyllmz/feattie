@@ -192,6 +192,10 @@ def build_rag_and_sot(products: list[dict]) -> tuple[list[dict], list[dict]]:
         updated_at = product.get("updated_at") or ""
         body_text = strip_html(product.get("body_html"))
 
+        # Get product images
+        images = product.get("images", [])
+        default_image_url = images[0].get("src") if images and len(images) > 0 else None
+
         tags_value = product.get("tags")
         if isinstance(tags_value, str):
             tags = [t.strip() for t in tags_value.split(",") if t.strip()]
@@ -216,6 +220,13 @@ def build_rag_and_sot(products: list[dict]) -> tuple[list[dict], list[dict]]:
             sku = variant.get("sku") or ""
             price = to_float_price(variant.get("price"))
             variant_updated = variant.get("updated_at") or updated_at
+
+            # Get variant image or fallback to product default image
+            variant_featured_image = variant.get("featured_image")
+            if variant_featured_image and isinstance(variant_featured_image, dict):
+                image_url = variant_featured_image.get("src")
+            else:
+                image_url = default_image_url
 
             if color:
                 product_colors.append(color)
@@ -274,6 +285,7 @@ def build_rag_and_sot(products: list[dict]) -> tuple[list[dict], list[dict]]:
                     "sizes": [size] if size else [],
                     "price": price,
                     "handle": handle,
+                    "image_url": image_url,
                     "updated_at": variant_updated,
                     "text": " ".join(text_fragments).strip(),
                 }

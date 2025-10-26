@@ -225,7 +225,7 @@ export interface ChatMessage {
 export interface ChatResponse {
   sessionId: string
   response: string
-  products?: Array<{
+  productsReferenced?: Array<{
     id: number
     title: string
     price: number
@@ -234,6 +234,7 @@ export interface ChatResponse {
   }>
   searchQuery?: string
   processingTime: number
+  elapsedMs?: number
 }
 
 // Chat API için credentials olmadan ayrı instance (chat endpoint public, AllowAnonymous)
